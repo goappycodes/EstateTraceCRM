@@ -17,6 +17,7 @@
     --money:#1f8a4c; --money-soft:#e7f4ec;
     --warn:#b06f02; --warn-soft:#fbf0db;
     --danger:#c5392f; --danger-soft:#fbe9e7;
+    --purple:#6c4ad6; --purple-soft:#efeafe;
     --radius:9px;
   }
   *{box-sizing:border-box}
@@ -71,6 +72,7 @@
   .btn.primary:hover{background:#2f4cc0}
   .btn.danger{color:var(--danger);border-color:#f0cfcc}
   .btn.danger:hover{background:var(--danger-soft)}
+  .btn.sm{padding:5px 10px;font-size:12px}
 
   /* cards + grid */
   .cards{display:grid;gap:14px}
@@ -79,29 +81,35 @@
   .grid-2{grid-template-columns:repeat(2,1fr)}
   @media(max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
-  .metric{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px}
+  .metric{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px;position:relative}
+  .metric.link{cursor:pointer;transition:border-color .12s,box-shadow .12s}
+  .metric.link:hover{border-color:var(--line-2);box-shadow:0 1px 4px rgba(20,25,40,.06)}
+  .metric.link .go{position:absolute;top:13px;right:14px;color:var(--tx-3);font-size:14px;opacity:0;transition:opacity .12s}
+  .metric.link:hover .go{opacity:1}
   .metric .k{font-size:12px;color:var(--tx-2);display:flex;align-items:center;gap:6px}
   .metric .v{font-size:26px;font-weight:600;margin-top:7px;letter-spacing:-.3px}
   .metric .v.money{color:var(--money)}
+  .metric .v.warn{color:var(--danger)}
   .metric .d{font-size:11.5px;color:var(--tx-3);margin-top:3px}
 
   /* tables */
   table.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
-  table.tbl th{text-align:left;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--tx-3);font-weight:500;padding:11px 14px;background:#fafbfc;border-bottom:1px solid var(--line)}
-  table.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
+  table.tbl th{text-align:left;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--tx-3);font-weight:500;padding:11px 14px;background:#fafbfc;border-bottom:1px solid var(--line);white-space:nowrap}
+  table.tbl td{padding:11px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:middle}
   table.tbl tr:last-child td{border-bottom:none}
-  table.tbl tbody tr{cursor:pointer}
-  table.tbl tbody tr:hover{background:#f7f8fb}
+  table.tbl tbody tr.clk{cursor:pointer}
+  table.tbl tbody tr.clk:hover{background:#f7f8fb}
   td.r,th.r{text-align:right}
   .muted{color:var(--tx-2)}
   .sm{font-size:11.5px;color:var(--tx-3)}
 
-  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:20px}
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:20px;white-space:nowrap}
   .pill.green{background:var(--money-soft);color:var(--money)}
   .pill.grey{background:#eef0f4;color:var(--tx-2)}
   .pill.amber{background:var(--warn-soft);color:var(--warn)}
   .pill.blue{background:var(--accent-soft);color:var(--accent)}
   .pill.red{background:var(--danger-soft);color:var(--danger)}
+  .pill.purple{background:var(--purple-soft);color:var(--purple)}
 
   .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
 
@@ -113,6 +121,15 @@
   .kv td:last-child{text-align:right;font-weight:500}
   .cardtitle{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--tx);margin-bottom:11px;text-transform:none}
   .cardtitle .ic{color:var(--tx-3)}
+
+  /* stage tracker */
+  .tracker{display:flex;gap:6px;margin:6px 0 4px}
+  .tracker .step{flex:1;text-align:center;font-size:11px;color:var(--tx-3);position:relative}
+  .tracker .step .bar{height:5px;border-radius:3px;background:#e3e6ee;margin-bottom:6px}
+  .tracker .step.done .bar{background:var(--accent)}
+  .tracker .step.done{color:var(--accent);font-weight:500}
+  .tracker .step.cur .bar{background:var(--accent)}
+  .tracker .step.cur{color:var(--tx);font-weight:600}
 
   .alertbar{background:var(--warn-soft);border:1px solid #f0d9a8;border-radius:var(--radius);padding:12px 15px;display:flex;align-items:center;gap:10px;font-size:13px;color:#7a4d02}
   .alertbar b{color:#5e3b01}
@@ -127,10 +144,31 @@
   .bars .bar.hist{background:#c4ccdd}
   .bars .lbl{font-size:11px;color:var(--tx-3)}
 
+  /* funnel */
+  .funnel{display:flex;flex-direction:column;gap:7px}
+  .frow{display:grid;grid-template-columns:108px 1fr auto;align-items:center;gap:12px;cursor:pointer;padding:5px 7px;border-radius:7px}
+  .frow:hover{background:#f7f8fb}
+  .ftrack{height:20px;background:#eef0f4;border-radius:5px;overflow:hidden;position:relative}
+  .ftrack .ffill{height:100%;border-radius:5px;min-width:3px}
+  .frow .fval{text-align:right;font-size:12.5px;color:var(--tx-2);white-space:nowrap}
+  .frow .fval b{color:var(--tx);font-weight:600}
+
+  .minirow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:6px}
+  .minirow:last-child{border-bottom:none}
+  .minirow:hover{background:#f7f8fb}
+
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px}
+  .section-head h2{margin:0}
+  .linkmore{font-size:12.5px;color:var(--accent);cursor:pointer;font-weight:500}
+  .linkmore:hover{text-decoration:underline}
+
+  .filterbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:13px;color:var(--tx-2)}
+  .chip{display:inline-flex;align-items:center;gap:7px;background:var(--accent-soft);color:var(--accent);padding:4px 11px;border-radius:20px;font-size:12.5px;font-weight:500}
+  .chip .x{cursor:pointer;font-weight:600;font-size:14px;line-height:1}
+
   .formrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
   .field label{display:block;font-size:12px;color:var(--tx-2);margin-bottom:5px}
   .field input,.field textarea{width:100%;font-family:inherit;font-size:13.5px;padding:9px 11px;border:1px solid var(--line-2);border-radius:7px;background:#fff}
-  .hint{font-size:12px;color:var(--tx-3);margin-top:-6px;margin-bottom:14px}
 
   .empty{color:var(--tx-3);font-size:13px;padding:40px;text-align:center;border:1px dashed var(--line-2);border-radius:var(--radius)}
   .hide{display:none !important}
@@ -171,25 +209,7 @@
       <div class="pagehead">
         <div><h1 id="dashTitle">Dashboard</h1><p class="sub" id="dashSub">Pipeline and follow-ups across active cases</p></div>
       </div>
-      <div class="cards grid-4" id="dashMetrics" style="margin-bottom:20px"></div>
-
-      <div class="cards grid-2" style="margin-bottom:20px">
-        <div class="card revenue">
-          <h2>Revenue by month</h2>
-          <div class="bars" id="dashChart"></div>
-          <div style="display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:var(--tx-3)">
-            <span><span class="dot" style="background:var(--accent)"></span> Pipeline (potential)</span>
-            <span><span class="dot" style="background:#c4ccdd"></span> Closed (historic)</span>
-          </div>
-        </div>
-        <div class="card">
-          <h2>Follow-ups due</h2>
-          <div id="dashFollow"></div>
-        </div>
-      </div>
-
-      <h2>Recent cases</h2>
-      <table class="tbl" id="dashCases"></table>
+      <div id="dashBody"></div>
     </section>
 
     <!-- CASES -->
@@ -198,6 +218,7 @@
         <div><h1>Cases</h1><p class="sub" id="casesSub">Active estate cases you have access to</p></div>
         <button class="btn primary new-case"><span>+</span> New case</button>
       </div>
+      <div id="caseFilterBar"></div>
       <table class="tbl" id="casesTbl"></table>
     </section>
 
@@ -293,63 +314,141 @@
 const VAT = 0.20;
 
 const referrers = [
-  {id:'r1', name:'Leeds City Council', type:'Local authority', commission:15, vat:true,  contact:'J. Okafor', email:'estates@leeds.gov.uk', phone:'0113 222 4000'},
-  {id:'r2', name:'Northgate Estates',  type:'Property finder', commission:12, vat:false, contact:'M. Hale',  email:'leads@northgate.co.uk', phone:'0161 884 1200'},
-  {id:'r3', name:'Harrow Council',     type:'Local authority', commission:15, vat:true,  contact:'S. Devi',  email:'probate@harrow.gov.uk', phone:'020 8901 2000'},
+  {id:'r1', name:'Leeds City Council',     type:'Local authority', commission:15, vat:true,  contact:'J. Okafor', email:'estates@leeds.gov.uk',        phone:'0113 222 4000', since:'2021'},
+  {id:'r2', name:'Northgate Estates',      type:'Property finder', commission:12, vat:false, contact:'M. Hale',   email:'leads@northgate.co.uk',        phone:'0161 884 1200', since:'2022'},
+  {id:'r3', name:'Harrow Council',         type:'Local authority', commission:15, vat:true,  contact:'S. Devi',   email:'probate@harrow.gov.uk',        phone:'020 8901 2000', since:'2020'},
+  {id:'r4', name:'Mersey Probate Partners',type:'Property finder', commission:10, vat:true,  contact:'D. Quinn',  email:'cases@merseyprobate.co.uk',    phone:'0151 707 3300', since:'2023'},
+  {id:'r5', name:'Bristol City Council',   type:'Local authority', commission:15, vat:true,  contact:'H. Marsh',  email:'estates@bristol.gov.uk',       phone:'0117 922 2000', since:'2022'},
+  {id:'r6', name:'Caldwell & Finch LLP',   type:'Solicitor',       commission:8,  vat:true,  contact:'R. Finch',  email:'probate@caldwellfinch.co.uk',  phone:'020 7405 9000', since:'2024'},
 ];
 
-const staffUsers = {sarah:'Sarah Mills', tom:'Tom Reed'};
+const staffUsers = {sarah:'Sarah Mills', tom:'Tom Reed', meena:'Meena Iqbal', james:'James Holt'};
+
+/* stages: the operational chain from tracing through settling, then closed */
+const STAGES = [
+  {key:'tracing',  label:'Tracing',  pill:'blue',   fill:'#3b5bdb'},
+  {key:'engaging', label:'Engaging', pill:'amber',  fill:'#b06f02'},
+  {key:'claiming', label:'Claiming', pill:'purple', fill:'#6c4ad6'},
+  {key:'settling', label:'Settling', pill:'green',  fill:'#1f8a4c'},
+  {key:'closed',   label:'Closed',   pill:'grey',   fill:'#c4ccdd'},
+];
+const stageMeta = k => STAGES.find(s=>s.key===k) || STAGES[0];
 
 const cases = [
-  { id:'EST-2041', status:'active', referrer:'r1', assigned:'sarah',
-    property:{addr:'14 Elm Row, Leeds LS8', valueNow:500000, valueDeath:430000, valueModern:560000, tenure:'Freehold', title:'WYK449201', beds:3},
-    deceased:{name:'Margaret Whitlock', pob:'Bradford', reg:'Leeds North', otherAssets:40000},
-    estate:500000,
+  { id:'EST-2041', stage:'engaging', status:'active', referrer:'r1', assigned:'sarah', opened:'02 Apr 2026',
+    property:{addr:'14 Elm Row, Leeds', postcode:'LS8 2RT', valueNow:500000, valueDeath:430000, valueModern:560000, tenure:'Freehold', title:'WYK449201', beds:3},
+    deceased:{name:'Margaret Whitlock', dob:'14 Mar 1938', dod:'09 Jan 2026', age:87, pob:'Bradford', reg:'Leeds North', otherAssets:40000},
+    estate:500000, nextAction:{label:'Chase contract response', date:'26 May', overdue:true},
     heirs:[
-      {name:'David Whitlock', rel:'Son', uk:true,  share:25, fee:10, comm:15, refVat:true,  letter:{type:'Chase letter', date:'12 May', due:'26 May', overdue:true}},
-      {name:'Anna Beaulieu',  rel:'Daughter', uk:false, share:50, fee:8,  comm:10, refVat:false, letter:{type:'Contract', date:'02 Jun', due:'16 Jun', overdue:false}},
+      {name:'David Whitlock', rel:'Son', uk:true,  share:25, fee:10, comm:15, refVat:true,  email:'d.whitlock@gmail.com',  phone:'07700 900112', status:'Contracted', letter:{type:'Chase letter', date:'12 May', due:'26 May', overdue:true}},
+      {name:'Anna Beaulieu',  rel:'Daughter', uk:false, share:50, fee:8,  comm:10, refVat:false, email:'anna.b@orange.fr',   phone:'+33 6 12 34 56', status:'Engaged', letter:{type:'Contract', date:'02 Jun', due:'16 Jun', overdue:false}},
     ]},
-  { id:'EST-2038', status:'active', referrer:'r2', assigned:'tom',
-    property:{addr:'7 Carlton Ave, Manchester M20', valueNow:285000, valueDeath:262000, valueModern:310000, tenure:'Leasehold', title:'GM118803', beds:2},
-    deceased:{name:'Albert Greaves', pob:'Salford', reg:'Manchester South', otherAssets:18000},
-    estate:285000,
+  { id:'EST-2038', stage:'claiming', status:'active', referrer:'r2', assigned:'tom', opened:'18 Mar 2026',
+    property:{addr:'7 Carlton Ave, Manchester', postcode:'M20 3LP', valueNow:285000, valueDeath:262000, valueModern:310000, tenure:'Leasehold', title:'GM118803', beds:2},
+    deceased:{name:'Albert Greaves', dob:'02 Jun 1941', dod:'21 Dec 2025', age:84, pob:'Salford', reg:'Manchester South', otherAssets:18000},
+    estate:285000, nextAction:{label:'Await grant of probate', date:'04 Jul', overdue:false},
     heirs:[
-      {name:'Janet Greaves', rel:'Sister', uk:true, share:100, fee:12, comm:12, refVat:false, letter:{type:'Scam warning', date:'20 Jun', due:'04 Jul', overdue:false}},
+      {name:'Janet Greaves', rel:'Sister', uk:true, share:100, fee:12, comm:12, refVat:false, email:'janet.greaves@yahoo.co.uk', phone:'07700 900233', status:'Contracted', letter:{type:'Scam warning', date:'20 Jun', due:'04 Jul', overdue:false}},
     ]},
-  { id:'EST-2052', status:'active', referrer:'r3', assigned:'sarah',
-    property:{addr:'33 Pinner Rd, Harrow HA1', valueNow:640000, valueDeath:600000, valueModern:700000, tenure:'Freehold', title:'MX552014', beds:4},
-    deceased:{name:'Doris Fenwick', pob:'Harrow', reg:'Harrow', otherAssets:75000},
-    estate:640000,
+  { id:'EST-2052', stage:'tracing', status:'active', referrer:'r3', assigned:'sarah', opened:'09 May 2026',
+    property:{addr:'33 Pinner Rd, Harrow', postcode:'HA1 4HZ', valueNow:640000, valueDeath:600000, valueModern:700000, tenure:'Freehold', title:'MX552014', beds:4},
+    deceased:{name:'Doris Fenwick', dob:'11 Nov 1935', dod:'30 Mar 2026', age:90, pob:'Harrow', reg:'Harrow', otherAssets:75000},
+    estate:640000, nextAction:{label:'Trace third heir', date:'22 May', overdue:true},
     heirs:[
-      {name:'Peter Fenwick', rel:'Nephew', uk:true,  share:40, fee:10, comm:15, refVat:true, letter:{type:'Chase letter', date:'08 May', due:'22 May', overdue:true}},
-      {name:'Lucia Romano',  rel:'Cousin', uk:false, share:30, fee:10, comm:15, refVat:true, letter:{type:'Contract', date:'18 Jun', due:'02 Jul', overdue:false}},
+      {name:'Peter Fenwick', rel:'Nephew', uk:true,  share:40, fee:10, comm:15, refVat:true, email:'pfenwick@btinternet.com', phone:'07700 900344', status:'Engaged', letter:{type:'Chase letter', date:'08 May', due:'22 May', overdue:true}},
+      {name:'Lucia Romano',  rel:'Cousin', uk:false, share:30, fee:10, comm:15, refVat:true, email:'lucia.romano@libero.it', phone:'+39 06 1234 56', status:'Tracing', letter:{type:'Contract', date:'18 Jun', due:'02 Jul', overdue:false}},
     ]},
-  { id:'EST-2019', status:'closed', referrer:'r1', assigned:'tom',
-    property:{addr:'2 Beech Close, Leeds LS6', valueNow:210000, valueDeath:198000, valueModern:240000, tenure:'Freehold', title:'WYK330117', beds:2},
-    deceased:{name:'Harold Pyne', pob:'Leeds', reg:'Leeds West', otherAssets:9000},
-    estate:210000,
+  { id:'EST-2061', stage:'engaging', status:'active', referrer:'r4', assigned:'meena', opened:'21 May 2026',
+    property:{addr:'5 Aigburth Dr, Liverpool', postcode:'L17 4JE', valueNow:235000, valueDeath:214000, valueModern:270000, tenure:'Freehold', title:'MS774120', beds:3},
+    deceased:{name:'Frank Doyle', dob:'27 Sep 1944', dod:'14 Apr 2026', age:81, pob:'Liverpool', reg:'Liverpool South', otherAssets:12000},
+    estate:235000, nextAction:{label:'Await signed contracts', date:'11 Jun', overdue:false},
     heirs:[
-      {name:'Ruth Pyne', rel:'Daughter', uk:true, share:100, fee:12, comm:15, refVat:true, letter:{type:'Contract', date:'10 Feb', due:'24 Feb', overdue:false}},
+      {name:'Sean Doyle',    rel:'Son', uk:true, share:50, fee:10, comm:10, refVat:true, email:'sean.doyle@gmail.com', phone:'07700 900455', status:'Engaged', letter:{type:'Intro letter', date:'28 May', due:'11 Jun', overdue:false}},
+      {name:'Bridget Doyle', rel:'Daughter', uk:true, share:50, fee:10, comm:10, refVat:true, email:'bridie.doyle@gmail.com', phone:'07700 900456', status:'Engaged', letter:{type:'Intro letter', date:'28 May', due:'11 Jun', overdue:false}},
     ]},
-  { id:'EST-2007', status:'closed', referrer:'r2', assigned:'sarah',
-    property:{addr:'19 Mill Lane, Stockport SK4', valueNow:175000, valueDeath:170000, valueModern:200000, tenure:'Leasehold', title:'GM092200', beds:2},
-    deceased:{name:'Edna Bramwell', pob:'Stockport', reg:'Stockport', otherAssets:6000},
-    estate:175000,
+  { id:'EST-2057', stage:'tracing', status:'active', referrer:'r5', assigned:'james', opened:'12 May 2026',
+    property:{addr:'9 Cotham Brow, Bristol', postcode:'BS6 6AR', valueNow:410000, valueDeath:388000, valueModern:455000, tenure:'Freehold', title:'BL220981', beds:4},
+    deceased:{name:'Eleanor Pidgeon', dob:'03 Feb 1939', dod:'02 Apr 2026', age:87, pob:'Bath', reg:'Bristol Central', otherAssets:22000},
+    estate:410000, nextAction:{label:'Confirm sole heir', date:'19 Jun', overdue:false},
     heirs:[
-      {name:'Colin Bramwell', rel:'Son', uk:true, share:60, fee:10, comm:12, refVat:false, letter:{type:'Contract', date:'14 Jan', due:'28 Jan', overdue:false}},
-      {name:'Maria Bramwell', rel:'Daughter', uk:true, share:40, fee:10, comm:12, refVat:false, letter:{type:'Other', date:'14 Jan', due:'28 Jan', overdue:false}},
+      {name:'Marcus Pidgeon', rel:'Grandson', uk:true, share:100, fee:12, comm:15, refVat:true, email:'m.pidgeon@hotmail.com', phone:'07700 900566', status:'Tracing', letter:{type:'Intro letter', date:'05 Jun', due:'19 Jun', overdue:false}},
+    ]},
+  { id:'EST-2049', stage:'settling', status:'active', referrer:'r1', assigned:'tom', opened:'28 Mar 2026',
+    property:{addr:'21 Roundhay Rd, Leeds', postcode:'LS7 1AB', valueNow:320000, valueDeath:300000, valueModern:360000, tenure:'Freehold', title:'WYK510244', beds:3},
+    deceased:{name:'Cyril Hawthorne', dob:'19 Aug 1937', dod:'11 Feb 2026', age:88, pob:'Leeds', reg:'Leeds East', otherAssets:15000},
+    estate:320000, nextAction:{label:'Pay referrer commission', date:'24 Jun', overdue:false},
+    heirs:[
+      {name:'Gloria Hawthorne', rel:'Daughter', uk:true, share:60, fee:10, comm:15, refVat:true, email:'gloria.h@gmail.com', phone:'07700 900677', status:'Paid', letter:{type:'Contract', date:'02 Apr', due:'16 Apr', overdue:false}},
+      {name:'Neil Hawthorne',   rel:'Son', uk:true, share:40, fee:10, comm:15, refVat:true, email:'neil.h@gmail.com', phone:'07700 900678', status:'Contracted', letter:{type:'Settlement', date:'10 Jun', due:'24 Jun', overdue:false}},
+    ]},
+  { id:'EST-2044', stage:'engaging', status:'active', referrer:'r6', assigned:'meena', opened:'15 Apr 2026',
+    property:{addr:'48 Crouch Hill, London', postcode:'N8 9DX', valueNow:720000, valueDeath:680000, valueModern:790000, tenure:'Freehold', title:'LN880455', beds:5},
+    deceased:{name:'Vincent Astley', dob:'06 Jul 1940', dod:'19 Mar 2026', age:85, pob:'London', reg:'Haringey', otherAssets:95000},
+    estate:720000, nextAction:{label:'Chase Camille contract', date:'15 Jun', overdue:true},
+    heirs:[
+      {name:'Camille Astley', rel:'Daughter', uk:true,  share:50, fee:8, comm:8, refVat:true, email:'camille.astley@gmail.com', phone:'07700 900788', status:'Engaged', letter:{type:'Chase letter', date:'01 Jun', due:'15 Jun', overdue:true}},
+      {name:'Hugo Astley',    rel:'Son', uk:false, share:50, fee:8, comm:8, refVat:true, email:'hugo.astley@web.de', phone:'+49 30 1234 56', status:'Engaged', letter:{type:'Contract', date:'12 Jun', due:'26 Jun', overdue:false}},
+    ]},
+  { id:'EST-2033', stage:'claiming', status:'active', referrer:'r2', assigned:'james', opened:'04 Mar 2026',
+    property:{addr:'12 Heaton Moor Rd, Stockport', postcode:'SK4 4NX', valueNow:268000, valueDeath:250000, valueModern:295000, tenure:'Leasehold', title:'GM330712', beds:2},
+    deceased:{name:'Maureen Slack', dob:'22 Oct 1943', dod:'28 Dec 2025', age:82, pob:'Stockport', reg:'Stockport', otherAssets:8000},
+    estate:268000, nextAction:{label:'Await grant', date:'23 Jun', overdue:false},
+    heirs:[
+      {name:'Karen Slack', rel:'Daughter', uk:true, share:100, fee:12, comm:12, refVat:false, email:'karen.slack@gmail.com', phone:'07700 900899', status:'Contracted', letter:{type:'Probate filed', date:'09 Jun', due:'23 Jun', overdue:false}},
+    ]},
+  { id:'EST-2029', stage:'tracing', status:'active', referrer:'r3', assigned:'sarah', opened:'30 Apr 2026',
+    property:{addr:'2 Bessborough Rd, Harrow', postcode:'HA1 3BS', valueNow:455000, valueDeath:430000, valueModern:500000, tenure:'Freehold', title:'MX610337', beds:3},
+    deceased:{name:'Ronald Pickering', dob:'15 Dec 1936', dod:'07 Apr 2026', age:89, pob:'Pinner', reg:'Harrow', otherAssets:30000},
+    estate:455000, nextAction:{label:'Locate current address', date:'16 Jun', overdue:true},
+    heirs:[
+      {name:'Diane Pickering', rel:'Niece', uk:true, share:100, fee:10, comm:15, refVat:true, email:'diane.p@outlook.com', phone:'07700 900911', status:'No contact', letter:{type:'Intro letter', date:'02 Jun', due:'16 Jun', overdue:true}},
+    ]},
+  { id:'EST-2019', stage:'closed', status:'closed', referrer:'r1', assigned:'tom', opened:'10 Jan 2026', closed:'24 Mar 2026',
+    property:{addr:'2 Beech Close, Leeds', postcode:'LS6 2QT', valueNow:210000, valueDeath:198000, valueModern:240000, tenure:'Freehold', title:'WYK330117', beds:2},
+    deceased:{name:'Harold Pyne', dob:'09 May 1940', dod:'02 Nov 2025', age:85, pob:'Leeds', reg:'Leeds West', otherAssets:9000},
+    estate:210000, nextAction:null,
+    heirs:[
+      {name:'Ruth Pyne', rel:'Daughter', uk:true, share:100, fee:12, comm:15, refVat:true, email:'ruth.pyne@gmail.com', phone:'07700 901011', status:'Paid', letter:{type:'Contract', date:'10 Feb', due:'24 Feb', overdue:false}},
+    ]},
+  { id:'EST-2007', stage:'closed', status:'closed', referrer:'r2', assigned:'sarah', opened:'05 Dec 2025', closed:'12 Feb 2026',
+    property:{addr:'19 Mill Lane, Stockport', postcode:'SK4 1QU', valueNow:175000, valueDeath:170000, valueModern:200000, tenure:'Leasehold', title:'GM092200', beds:2},
+    deceased:{name:'Edna Bramwell', dob:'30 Jul 1942', dod:'18 Sep 2025', age:83, pob:'Stockport', reg:'Stockport', otherAssets:6000},
+    estate:175000, nextAction:null,
+    heirs:[
+      {name:'Colin Bramwell', rel:'Son', uk:true, share:60, fee:10, comm:12, refVat:false, email:'colin.b@gmail.com', phone:'07700 901112', status:'Paid', letter:{type:'Contract', date:'14 Jan', due:'28 Jan', overdue:false}},
+      {name:'Maria Bramwell', rel:'Daughter', uk:true, share:40, fee:10, comm:12, refVat:false, email:'maria.b@gmail.com', phone:'07700 901113', status:'Paid', letter:{type:'Settlement', date:'14 Jan', due:'28 Jan', overdue:false}},
+    ]},
+  { id:'EST-1998', stage:'closed', status:'closed', referrer:'r5', assigned:'james', opened:'18 Nov 2025', closed:'21 Mar 2026',
+    property:{addr:'14 Sefton Park Rd, Bristol', postcode:'BS7 9AL', valueNow:298000, valueDeath:285000, valueModern:330000, tenure:'Freehold', title:'BL110663', beds:3},
+    deceased:{name:'Walter Combe', dob:'12 Apr 1939', dod:'02 Aug 2025', age:86, pob:'Bristol', reg:'Bristol North', otherAssets:11000},
+    estate:298000, nextAction:null,
+    heirs:[
+      {name:'Pauline Combe', rel:'Daughter', uk:true, share:100, fee:12, comm:15, refVat:true, email:'pauline.combe@gmail.com', phone:'07700 901213', status:'Paid', letter:{type:'Contract', date:'03 Mar', due:'17 Mar', overdue:false}},
+    ]},
+  { id:'EST-1985', stage:'closed', status:'closed', referrer:'r4', assigned:'meena', opened:'02 Nov 2025', closed:'06 Mar 2026',
+    property:{addr:'31 Queens Dr, Liverpool', postcode:'L4 6SH', valueNow:162000, valueDeath:155000, valueModern:185000, tenure:'Freehold', title:'MS445221', beds:2},
+    deceased:{name:'Stanley Birch', dob:'25 Jan 1941', dod:'14 Jul 2025', age:84, pob:'Liverpool', reg:'Liverpool North', otherAssets:5000},
+    estate:162000, nextAction:null,
+    heirs:[
+      {name:'Derek Birch', rel:'Son', uk:true, share:100, fee:10, comm:10, refVat:true, email:'derek.birch@gmail.com', phone:'07700 901314', status:'Paid', letter:{type:'Contract', date:'20 Feb', due:'06 Mar', overdue:false}},
     ]},
 ];
 
 const intake = [
-  {addr:'81 Foundry St, Leeds LS9', source:'Website form', referrer:'r1', date:'28 Jun', flag:'New'},
-  {addr:'5 Vicarage Rd, Harrow HA2', source:'Referrer upload', referrer:'r3', date:'27 Jun', flag:'New'},
-  {addr:'12 Quay St, Manchester M3', source:'Website form', referrer:null, date:'25 Jun', flag:'New'},
+  {addr:'81 Foundry St, Leeds',     postcode:'LS9 8JT', source:'Website form',    referrer:'r1',  date:'28 Jun', priority:'High',   flag:'New'},
+  {addr:'5 Vicarage Rd, Harrow',    postcode:'HA2 0HG', source:'Referrer upload', referrer:'r3',  date:'27 Jun', priority:'Medium', flag:'New'},
+  {addr:'12 Quay St, Manchester',   postcode:'M3 4AE',  source:'Website form',    referrer:null,  date:'25 Jun', priority:'Low',    flag:'New'},
+  {addr:'60 Gloucester Rd, Bristol',postcode:'BS7 8AE', source:'Referrer upload', referrer:'r5',  date:'24 Jun', priority:'Medium', flag:'New'},
+  {addr:'3 Smithdown Rd, Liverpool',postcode:'L7 4JG',  source:'Website form',    referrer:'r4',  date:'23 Jun', priority:'High',   flag:'In review'},
+  {addr:'27 Park Lane, London',     postcode:'N8 0JN',  source:'Referrer upload', referrer:'r6',  date:'21 Jun', priority:'Medium', flag:'New'},
 ];
 
 const deleted = [
-  {rec:'Case EST-1990', by:'Priya (Management)', when:'19 Jun', reason:'Duplicate of EST-1988'},
-  {rec:'Client: George Tully', by:'You (Super admin)', when:'11 Jun', reason:'Wrong estate linked'},
+  {rec:'Case EST-1990',        type:'Case',     by:'Priya (Management)', when:'19 Jun', reason:'Duplicate of EST-1988'},
+  {rec:'Client: George Tully', type:'Heir',     by:'You (Super admin)',  when:'11 Jun', reason:'Wrong estate linked'},
+  {rec:'Property: 8 Kirkstall Rd', type:'Property', by:'Tom (Staff)',    when:'05 Jun', reason:'Listed in error'},
+  {rec:'Referrer: Old Mill Leads', type:'Referrer', by:'You (Super admin)', when:'28 May', reason:'Merged into Northgate'},
+  {rec:'Case EST-1974',        type:'Case',     by:'Priya (Management)', when:'14 May', reason:'Withdrawn by referrer'},
 ];
 
 /* ---------- revenue engine ---------- */
@@ -370,6 +469,7 @@ function caseTotals(c){
   return {firmNet, invoiced, vatHmrc:vatOut-vatIn, commission:comm};
 }
 const gbp = n => '£'+Math.round(n).toLocaleString('en-GB');
+const gbpK = n => '£'+(Math.round(n/100)/10).toLocaleString('en-GB')+'k';
 
 /* ---------- roles ---------- */
 const ROLES = {
@@ -381,6 +481,8 @@ const ROLES = {
 };
 let role = ROLES.super;
 let roleKey = 'super';
+const isReferrer = ()=>role.scope==='referrer';
+const isInternal = ()=>!isReferrer();
 
 const NAV = [
   {grp:'Operations'},
@@ -412,7 +514,42 @@ function navAllowed(item){
   return item.roles.includes(roleKey);
 }
 
-/* ---------- render ---------- */
+/* ---------- filter (drives drill-down from dashboard) ---------- */
+let caseFilter = null; // {type, value, label}
+function setFilter(type, value, label){ caseFilter={type,value,label}; renderCases(); go('cases'); }
+function clearFilter(){ caseFilter=null; renderCases(); }
+function applyFilter(list){
+  if(!caseFilter) return list;
+  const f=caseFilter;
+  if(f.type==='stage')    return list.filter(c=>c.stage===f.value);
+  if(f.type==='status')   return list.filter(c=>c.status===f.value);
+  if(f.type==='overdue')  return list.filter(c=>c.heirs.some(h=>h.letter.overdue));
+  if(f.type==='referrer') return list.filter(c=>c.referrer===f.value);
+  if(f.type==='owner')    return list.filter(c=>c.assigned===f.value);
+  return list;
+}
+
+/* ---------- small render helpers ---------- */
+function statusPill(s){ return s==='active'?'<span class="pill green"><span class="dot" style="background:var(--money)"></span>Active</span>':'<span class="pill grey">Closed</span>'; }
+function stagePill(k){ const m=stageMeta(k); return `<span class="pill ${m.pill}">${m.label}</span>`; }
+function heirStatusPill(s){ const map={'Paid':'green','Contracted':'purple','Engaged':'blue','Tracing':'grey','No contact':'red'}; return `<span class="pill ${map[s]||'grey'}">${s}</span>`; }
+function ownerCell(uid){ const n=staffUsers[uid]||'—'; const init=n.split(' ').map(x=>x[0]).join('').slice(0,2); return `<span class="who" style="gap:7px"><span class="avatar" style="width:24px;height:24px;font-size:10px">${init}</span><span style="font-size:12.5px">${n}</span></span>`; }
+function nextActionCell(c){
+  if(!c.nextAction) return '<span class="muted">—</span>';
+  const o=c.nextAction.overdue;
+  return `<div>${c.nextAction.label}</div><div class="sm" style="${o?'color:var(--danger);font-weight:500':''}">${o?'Overdue · ':'Due '}${c.nextAction.date}</div>`;
+}
+const refName = id => (referrers.find(r=>r.id===id)||{}).name || '—';
+
+/* referrer-level rollups */
+function referrerStats(id){
+  const cs=cases.filter(c=>c.referrer===id);
+  const active=cs.filter(c=>c.status==='active');
+  let pipelineComm=0; cs.forEach(c=>{ if(c.status==='active') pipelineComm+=caseTotals(c).commission; });
+  return {total:cs.length, active:active.length, closed:cs.length-active.length, pipelineComm};
+}
+
+/* ---------- nav ---------- */
 function renderNav(){
   const nav = document.getElementById('nav');
   nav.innerHTML='';
@@ -423,7 +560,7 @@ function renderNav(){
     }
     if(!navAllowed(item)) return;
     const a=document.createElement('a'); a.className='item'; a.dataset.screen=item.id;
-    a.onclick=()=>go(item.id);
+    a.onclick=()=>{ if(item.id==='cases') caseFilter=null; go(item.id); };
     let badge = item.badge? `<span class="badge">${item.badge()}</span>`:'';
     a.innerHTML=`<span class="ic">${item.ic}</span><span>${item.label}</span>${badge}`;
     nav.appendChild(a);
@@ -434,9 +571,12 @@ function highlightNav(id){
   document.querySelectorAll('nav .item').forEach(a=>a.classList.toggle('active', a.dataset.screen===id));
 }
 
+/* ---------- navigation ---------- */
+const RENDER={dashboard:renderDashboard,cases:renderCases,properties:renderProperties,referrers:renderReferrers,clients:renderClients,deceased:renderDeceased,intake:renderIntake,reports:renderReports,deleted:renderDeleted};
 let current='dashboard';
 function go(id){
   current=id;
+  if(RENDER[id]) RENDER[id]();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
   const el=document.getElementById('s-'+id); if(el) el.classList.add('show');
   highlightNav(id==='case'?'cases':id);
@@ -445,104 +585,212 @@ function go(id){
   window.scrollTo(0,0);
 }
 
-function statusPill(s){ return s==='active'?'<span class="pill green"><span class="dot" style="background:var(--money)"></span>Active</span>':'<span class="pill grey">Closed</span>'; }
-
+/* ---------- dashboard ---------- */
 function renderDashboard(){
   const vc = visibleCases();
   const active = vc.filter(c=>c.status==='active');
   const closed = vc.filter(c=>c.status==='closed');
-  let pipeline=0, historic=0, commission=0;
-  active.forEach(c=>{pipeline+=caseTotals(c).firmNet; commission+=caseTotals(c).commission;});
+  let pipeline=0, historic=0, commission=0, invoiced=0;
+  active.forEach(c=>{const t=caseTotals(c); pipeline+=t.firmNet; commission+=t.commission; invoiced+=t.invoiced;});
   closed.forEach(c=>{historic+=caseTotals(c).firmNet;});
-  const overdue = vc.flatMap(c=>c.heirs.filter(h=>h.letter.overdue).map(h=>({c,h}))).length;
+  const follows = vc.flatMap(c=>c.heirs.filter(h=>h.letter.overdue).map(h=>({c,h})));
+  const heirsCount = vc.reduce((a,c)=>a+c.heirs.length,0);
 
-  // metrics depend on role
-  const m=document.getElementById('dashMetrics'); m.innerHTML='';
-  const metrics=[];
-  metrics.push({k:'Active cases',v:active.length});
+  document.getElementById('dashTitle').textContent = isReferrer()? 'Referrer dashboard' : 'Dashboard';
+  document.getElementById('dashSub').textContent = role.seeCommission? 'Your referred cases and potential commission'
+    : isReferrer()? 'Cases you referred to us' : 'Pipeline, follow-ups and stage progress across your cases';
+
+  /* metric cards (role-aware, all linked) */
+  let metrics=[];
+  metrics.push({k:'Active cases', v:active.length, go:()=>{caseFilter=null;go('cases');}, d:`${closed.length} closed`});
   if(role.seeRevenue){
-    metrics.push({k:'Pipeline revenue',v:gbp(pipeline),money:true,d:'Our net, potential'});
-    metrics.push({k:'Historic revenue',v:gbp(historic),money:true,d:'Closed cases'});
+    metrics.push({k:'Pipeline revenue', v:gbp(pipeline), money:true, d:'Our net, potential', go:()=>go('reports')});
+    metrics.push({k:'Historic revenue', v:gbp(historic), money:true, d:'Closed cases', go:()=>go('reports')});
+    metrics.push({k:'Follow-ups due', v:follows.length, warn:follows.length>0, d:follows.length?'Action needed':'All clear', go:()=>setFilter('overdue',1,'Overdue follow-ups')});
   } else if(role.seeCommission){
-    metrics.push({k:'Potential commission',v:gbp(commission),money:true,d:'Due to you on active cases'});
-    metrics.push({k:'Cases referred',v:vc.length});
+    metrics.push({k:'Potential commission', v:gbp(commission), money:true, d:'Due to you on active cases', go:()=>go('reports')});
+    metrics.push({k:'Cases referred', v:vc.length, go:()=>{caseFilter=null;go('cases');}});
+    metrics.push({k:'Heirs engaged', v:heirsCount, d:'Across your cases'});
   } else {
-    metrics.push({k:'Closed cases',v:closed.length});
-    metrics.push({k:'Heirs engaged',v:vc.reduce((a,c)=>a+c.heirs.length,0)});
+    metrics.push({k:'Follow-ups due', v:follows.length, warn:follows.length>0, d:follows.length?'Action needed':'All clear', go:()=>setFilter('overdue',1,'Overdue follow-ups')});
+    metrics.push({k:'Heirs engaged', v:heirsCount, go:()=>go('clients'), d:'Living clients'});
+    if(isInternal()) metrics.push({k:'Intake to review', v:intake.length, go:()=>go('intake'), d:'New properties'});
   }
-  metrics.push({k:'Follow-ups due',v:overdue,d:overdue?'Action needed':'All clear'});
-  metrics.forEach(x=>{
-    m.innerHTML+=`<div class="metric"><div class="k">${x.k}</div><div class="v ${x.money?'money':''}">${x.v}</div>${x.d?`<div class="d">${x.d}</div>`:''}</div>`;
+
+  let html = `<div class="cards grid-4" style="margin-bottom:18px">` + metrics.map(m=>`
+    <div class="metric ${m.go?'link':''}" ${m.go?`onclick="(${'window.__dashGo'})('${m.k}')"`:''}>
+      ${m.go?'<span class="go">→</span>':''}
+      <div class="k">${m.k}</div>
+      <div class="v ${m.money?'money':''} ${m.warn?'warn':''}">${m.v}</div>
+      ${m.d?`<div class="d">${m.d}</div>`:''}
+    </div>`).join('') + `</div>`;
+
+  // wire metric clicks
+  window.__dashGo = (k)=>{ const m=metrics.find(x=>x.k===k); if(m&&m.go) m.go(); };
+
+  /* stage funnel + side panel */
+  const stageRows = STAGES.filter(s=>s.key!=='closed').map(s=>{
+    const list=active.filter(c=>c.stage===s.key);
+    const val = role.seeRevenue? list.reduce((a,c)=>a+caseTotals(c).firmNet,0)
+             : role.seeCommission? list.reduce((a,c)=>a+caseTotals(c).commission,0) : null;
+    return {s, count:list.length, val};
   });
+  const maxCount = Math.max(1, ...stageRows.map(r=>r.count));
+  const funnel = `<div class="card">
+    <div class="section-head" style="margin:0 0 12px"><h2>Pipeline by stage</h2><span class="linkmore" onclick="caseFilter=null;go('cases')">View all →</span></div>
+    <div class="funnel">${stageRows.map(r=>`
+      <div class="frow" onclick="setFilter('stage','${r.s.key}','${r.s.label} cases')">
+        <div>${stagePill(r.s.key)}</div>
+        <div class="ftrack"><div class="ffill" style="width:${r.count/maxCount*100}%;background:${r.s.fill}"></div></div>
+        <div class="fval"><b>${r.count}</b>${r.val!=null?` · ${gbpK(r.val)}`:''}</div>
+      </div>`).join('')}</div></div>`;
 
-  // chart
-  document.querySelectorAll('.card.revenue').forEach(c=>c.classList.toggle('hide', !(role.seeRevenue||role.seeCommission)));
+  /* side panel: follow-ups (internal) or commission summary (referrer) */
+  let side;
+  if(isInternal()){
+    side = `<div class="card">
+      <div class="section-head" style="margin:0 0 12px"><h2>Follow-ups due</h2>${follows.length?`<span class="linkmore" onclick="setFilter('overdue',1,'Overdue follow-ups')">See cases →</span>`:''}</div>
+      ${follows.length? follows.map(({c,h})=>`
+        <div class="minirow" onclick="openCase('${c.id}')">
+          <div><b style="font-weight:500">${h.name}</b><div class="sm">${c.id} · ${h.letter.type} sent ${h.letter.date}</div></div>
+          <span class="pill amber">Due ${h.letter.due}</span>
+        </div>`).join('') : '<div class="empty">No outstanding follow-ups</div>'}</div>`;
+  } else {
+    side = `<div class="card">
+      <div class="section-head" style="margin:0 0 12px"><h2>Your cases</h2><span class="linkmore" onclick="caseFilter=null;go('cases')">View all →</span></div>
+      ${active.map(c=>`<div class="minirow" onclick="openCase('${c.id}')">
+        <div><b style="font-weight:500">${c.id}</b><div class="sm">${c.property.addr}</div></div>
+        ${role.seeCommission?`<span class="mono" style="color:var(--money)">${gbp(caseTotals(c).commission)}</span>`:stagePill(c.stage)}
+      </div>`).join('')}</div>`;
+  }
+  html += `<div class="cards grid-2" style="margin-bottom:18px">${funnel}${side}</div>`;
+
+  /* revenue chart + top referrers / new intake */
+  if(role.seeRevenue || role.seeCommission){
+    const chartTitle = role.seeCommission? 'Commission by month' : 'Revenue by month';
+    let secondCard;
+    if(isInternal()){
+      const ranked = [...referrers].map(r=>({r, st:referrerStats(r.id)})).filter(x=>x.st.active>0).sort((a,b)=>b.st.active-a.st.active).slice(0,5);
+      secondCard = `<div class="card">
+        <div class="section-head" style="margin:0 0 12px"><h2>Top referrers</h2><span class="linkmore" onclick="go('referrers')">All referrers →</span></div>
+        ${ranked.map(({r,st})=>`<div class="minirow" onclick="setFilter('referrer','${r.id}','${r.name}')">
+          <div><b style="font-weight:500">${r.name}</b><div class="sm">${r.type} · ${r.commission}% commission</div></div>
+          <div style="text-align:right"><b style="font-weight:600">${st.active}</b><div class="sm">active</div></div>
+        </div>`).join('')}</div>`;
+    } else {
+      secondCard = `<div class="card">
+        <div class="section-head" style="margin:0 0 12px"><h2>Commission summary</h2><span class="linkmore" onclick="go('reports')">Full report →</span></div>
+        <div class="minirow" style="cursor:default"><div>Active cases referred</div><b>${active.length}</b></div>
+        <div class="minirow" style="cursor:default"><div>Potential commission</div><b class="mono" style="color:var(--money)">${gbp(commission)}</b></div>
+        <div class="minirow" style="cursor:default"><div>Closed (paid)</div><b>${closed.length}</b></div>
+      </div>`;
+    }
+    html += `<div class="cards grid-2" style="margin-bottom:18px">
+      <div class="card"><h2>${chartTitle}</h2><div class="bars" id="dashChart"></div>
+        <div style="display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:var(--tx-3)">
+          <span><span class="dot" style="background:var(--accent)"></span> Pipeline (potential)</span>
+          <span><span class="dot" style="background:#c4ccdd"></span> Closed (historic)</span>
+        </div></div>
+      ${secondCard}</div>`;
+  } else if(isInternal()){
+    // managers/staff: show intake mini + owner workload
+    const byOwner = {};
+    active.forEach(c=>{ byOwner[c.assigned]=(byOwner[c.assigned]||0)+1; });
+    html += `<div class="cards grid-2" style="margin-bottom:18px">
+      <div class="card"><div class="section-head" style="margin:0 0 12px"><h2>New in intake</h2><span class="linkmore" onclick="go('intake')">Open queue →</span></div>
+        ${intake.slice(0,4).map(i=>`<div class="minirow" onclick="go('intake')"><div><b style="font-weight:500">${i.addr}</b><div class="sm">${i.source} · ${refName(i.referrer)==='—'?'Public':refName(i.referrer)}</div></div><span class="pill ${i.priority==='High'?'red':i.priority==='Medium'?'amber':'grey'}">${i.priority}</span></div>`).join('')}</div>
+      <div class="card"><div class="section-head" style="margin:0 0 12px"><h2>Caseload by owner</h2><span class="linkmore" onclick="caseFilter=null;go('cases')">View all →</span></div>
+        ${Object.keys(byOwner).map(uid=>`<div class="minirow" onclick="setFilter('owner','${uid}','${staffUsers[uid]}')"><div>${ownerCell(uid)}</div><div style="text-align:right"><b>${byOwner[uid]}</b><div class="sm">active</div></div></div>`).join('') || '<div class="empty">No active cases</div>'}</div>
+    </div>`;
+  }
+
+  /* recent cases */
+  html += `<div class="section-head"><h2>Recent cases</h2><span class="linkmore" onclick="caseFilter=null;go('cases')">View all cases →</span></div>
+    <table class="tbl" id="dashCases"></table>`;
+
+  document.getElementById('dashBody').innerHTML = html;
   if(role.seeRevenue||role.seeCommission) renderChart('dashChart');
-
-  // follow ups
-  const f=document.getElementById('dashFollow');
-  const fl = vc.flatMap(c=>c.heirs.filter(h=>h.letter.overdue).map(h=>({c,h})));
-  f.innerHTML = fl.length? fl.map(({c,h})=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)"><div><b style="font-weight:500">${h.name}</b><div class="sm">${c.id} · ${h.letter.type} sent ${h.letter.date}</div></div><span class="pill amber">Due ${h.letter.due}</span></div>`).join('') : '<div class="empty">No outstanding follow-ups</div>';
-
-  // recent cases
-  renderCaseTable('dashCases', vc.slice(0,4));
-  document.getElementById('dashTitle').textContent = role.scope==='referrer'? 'Referrer dashboard' : 'Dashboard';
-  document.getElementById('dashSub').textContent = role.seeCommission? 'Your referred cases and potential commission' : 'Pipeline and follow-ups across your cases';
+  renderCaseTable('dashCases', vc.slice(0,5), false);
 }
 
 function renderChart(elId){
   const data=[{m:'Feb',p:0,h:8200},{m:'Mar',p:0,h:5400},{m:'Apr',p:6800,h:0},{m:'May',p:18400,h:0},{m:'Jun',p:24600,h:0}];
   const max=Math.max(...data.map(d=>Math.max(d.p,d.h)));
-  document.getElementById(elId).innerHTML=data.map(d=>{
+  const el=document.getElementById(elId); if(!el) return;
+  el.innerHTML=data.map(d=>{
     const ph=d.p/max*100, hh=d.h/max*100;
     const bar = d.p>0?`<div class="bar" style="height:${ph}%"></div>`:`<div class="bar hist" style="height:${hh}%"></div>`;
     return `<div class="col">${bar}<div class="lbl">${d.m}</div></div>`;
   }).join('');
 }
 
-function renderCaseTable(elId, list){
+/* ---------- case table (shared) ---------- */
+function renderCaseTable(elId, list, full){
   const showMoney = role.seeRevenue;
   const showComm = role.seeCommission;
-  const head=`<thead><tr><th>Case</th><th>Property</th><th>Referrer</th><th>Heirs</th>${showMoney?'<th class="r">Net revenue</th>':''}${showComm?'<th class="r">Your commission</th>':''}<th>Status</th></tr></thead>`;
+  const showOwner = full && isInternal();
+  const head=`<thead><tr>
+    <th>Case</th><th>Property</th>${full?'<th>Referrer</th>':''}<th>Stage</th>
+    ${showOwner?'<th>Owner</th>':''}<th class="r">Heirs</th>${full?'<th class="r">Estate</th>':''}
+    ${showMoney?'<th class="r">Net revenue</th>':''}${showComm?'<th class="r">Your commission</th>':''}
+    ${full?'<th>Next action</th>':''}<th>Status</th></tr></thead>`;
   const rows=list.map(c=>{
-    const t=caseTotals(c); const ref=referrers.find(r=>r.id===c.referrer);
-    return `<tr onclick="openCase('${c.id}')">
-      <td><b style="font-weight:500" class="mono">${c.id}</b></td>
-      <td>${c.property.addr}<div class="sm">${c.deceased.name}</div></td>
-      <td>${ref.name}</td>
-      <td>${c.heirs.length}</td>
+    const t=caseTotals(c);
+    return `<tr class="clk" onclick="openCase('${c.id}')">
+      <td><b style="font-weight:500" class="mono">${c.id}</b><div class="sm">${c.opened||''}</div></td>
+      <td>${c.property.addr}<div class="sm">${c.property.postcode} · ${c.deceased.name}</div></td>
+      ${full?`<td>${refName(c.referrer)}</td>`:''}
+      <td>${stagePill(c.stage)}</td>
+      ${showOwner?`<td>${ownerCell(c.assigned)}</td>`:''}
+      <td class="r">${c.heirs.length}</td>
+      ${full?`<td class="r mono">${gbp(c.estate)}</td>`:''}
       ${showMoney?`<td class="r mono" style="color:var(--money)">${gbp(t.firmNet)}</td>`:''}
       ${showComm?`<td class="r mono" style="color:var(--money)">${gbp(t.commission)}</td>`:''}
+      ${full?`<td>${nextActionCell(c)}</td>`:''}
       <td>${statusPill(c.status)}</td>
     </tr>`;
   }).join('');
-  document.getElementById(elId).innerHTML=head+'<tbody>'+(rows||`<tr><td colspan="7"><div class="empty">No cases visible to this role</div></td></tr>`)+'</tbody>';
+  const cols = head.split('<th').length-1;
+  document.getElementById(elId).innerHTML=head+'<tbody>'+(rows||`<tr><td colspan="${cols}"><div class="empty">No cases visible to this role</div></td></tr>`)+'</tbody>';
 }
 
 function renderCases(){
-  renderCaseTable('casesTbl', visibleCases());
-  document.getElementById('casesSub').textContent = role.scope==='referrer'? 'Cases you referred to us' : 'Estate cases you have access to';
+  const list = applyFilter(visibleCases());
+  renderCaseTable('casesTbl', list, true);
+  document.getElementById('casesSub').textContent = isReferrer()? 'Cases you referred to us' : 'Estate cases you have access to';
+  const bar=document.getElementById('caseFilterBar');
+  bar.innerHTML = caseFilter? `<div class="filterbar">Filtered by <span class="chip">${caseFilter.label}<span class="x" onclick="clearFilter()">×</span></span><span class="sm">${list.length} case${list.length!==1?'s':''}</span></div>` : '';
 }
 
+/* ---------- case detail ---------- */
 function openCase(id){
   const c=cases.find(x=>x.id===id);
   const ref=referrers.find(r=>r.id===c.referrer);
   const t=caseTotals(c);
   const showMoney=role.seeRevenue, showComm=role.seeCommission;
 
-  const heirHead=`<tr><th>Heir</th><th class="r">Share</th>${showMoney?'<th class="r">Our fee</th><th class="r">VAT</th><th class="r">Commission</th><th class="r">Net kept</th>':''}${showComm?'<th class="r">Commission to you</th>':''}<th>Last letter</th></tr>`;
+  const heirHead=`<tr><th>Heir</th><th>Status</th><th class="r">Share</th>${showMoney?'<th class="r">Our fee</th><th class="r">VAT</th><th class="r">Commission</th><th class="r">Net kept</th>':''}${showComm?'<th class="r">Commission to you</th>':''}<th>Contact</th><th>Last letter</th></tr>`;
   const heirRows=c.heirs.map(h=>{
     const r=calcHeir(c.estate,h);
     return `<tr style="cursor:default">
       <td><b style="font-weight:500">${h.name}</b><div class="sm">${h.rel} · ${h.uk?'UK':'Non-UK'}</div></td>
+      <td>${heirStatusPill(h.status)}</td>
       <td class="r mono">${gbp(r.inheritance)}<div class="sm">${h.share}%</div></td>
       ${showMoney?`<td class="r mono">${gbp(r.netFee)}</td><td class="r mono">${gbp(r.vatFee)}</td><td class="r mono">${gbp(r.netComm)}</td><td class="r mono" style="color:var(--money);font-weight:500">${gbp(r.firmNet)}</td>`:''}
       ${showComm?`<td class="r mono" style="color:var(--money)">${gbp(r.grossComm)}</td>`:''}
+      <td class="sm">${h.email||'—'}<div>${h.phone||''}</div></td>
       <td>${h.letter.type} · ${h.letter.date}${h.letter.overdue?' <span class="pill amber">overdue</span>':''}</td>
     </tr>`;
   }).join('');
 
   const overdueHeir=c.heirs.find(h=>h.letter.overdue);
+
+  /* stage tracker */
+  const order=STAGES.map(s=>s.key);
+  const curIdx=order.indexOf(c.stage);
+  const tracker=`<div class="card" style="margin-bottom:16px"><div class="cardtitle">Case progress</div><div class="tracker">${STAGES.map((s,i)=>{
+    const cls = i<curIdx?'done':i===curIdx?'cur':''; return `<div class="step ${cls}"><div class="bar"></div>${s.label}</div>`;
+  }).join('')}</div></div>`;
 
   let moneyStrip='';
   if(showMoney){
@@ -560,8 +808,8 @@ function openCase(id){
   document.getElementById('caseBody').innerHTML=`
     <div class="detail-head">
       <div>
-        <h1 style="display:flex;align-items:center;gap:10px"><span class="mono">${c.id}</span> ${statusPill(c.status)}</h1>
-        <p class="sub" style="margin-top:4px">Estate of ${c.deceased.name} · ${c.property.addr}</p>
+        <h1 style="display:flex;align-items:center;gap:10px"><span class="mono">${c.id}</span> ${stagePill(c.stage)} ${statusPill(c.status)}</h1>
+        <p class="sub" style="margin-top:4px">Estate of ${c.deceased.name} · ${c.property.addr} ${c.property.postcode} · opened ${c.opened||'—'}${isInternal()?` · owner ${staffUsers[c.assigned]}`:''}</p>
       </div>
       <div style="display:flex;gap:8px">
         ${role.canDelete?'<button class="btn danger">Soft delete</button>':''}
@@ -569,10 +817,14 @@ function openCase(id){
       </div>
     </div>
 
+    ${c.nextAction?`<div class="alertbar" style="${c.nextAction.overdue?'':'background:var(--accent-soft);border-color:#c8d4f5;color:var(--accent)'}"><span style="font-size:16px">${c.nextAction.overdue?'⚑':'➤'}</span><div><b>Next action.</b> ${c.nextAction.label} · ${c.nextAction.overdue?'overdue, was due':'due'} ${c.nextAction.date}.</div></div>`:''}
+    ${tracker}
+
     <div class="cards grid-3" style="margin-bottom:8px">
       <div class="card">
         <div class="cardtitle"><span class="ic">⌂</span> Property</div>
         <table class="kv">
+          <tr><td>Address</td><td>${c.property.postcode}</td></tr>
           <tr><td>Value now</td><td>${gbp(c.property.valueNow)}</td></tr>
           <tr><td>At death</td><td>${gbp(c.property.valueDeath)}</td></tr>
           <tr><td>If modernised</td><td>${gbp(c.property.valueModern)}</td></tr>
@@ -585,6 +837,8 @@ function openCase(id){
         <div class="cardtitle"><span class="ic">†</span> Deceased</div>
         <table class="kv">
           <tr><td>Name</td><td>${c.deceased.name}</td></tr>
+          <tr><td>Born</td><td>${c.deceased.dob}</td></tr>
+          <tr><td>Died</td><td>${c.deceased.dod} (${c.deceased.age})</td></tr>
           <tr><td>Place of birth</td><td>${c.deceased.pob}</td></tr>
           <tr><td>Reg. district</td><td>${c.deceased.reg}</td></tr>
           <tr><td>Other assets</td><td>${gbp(c.deceased.otherAssets)}</td></tr>
@@ -599,6 +853,7 @@ function openCase(id){
           <tr><td>Commission</td><td>${ref.commission}%</td></tr>
           <tr><td>VAT registered</td><td>${ref.vat?'Yes':'No'}</td></tr>
           <tr><td>Contact</td><td>${ref.contact}</td></tr>
+          <tr><td>Phone</td><td>${ref.phone}</td></tr>
         </table>
       </div>
     </div>
@@ -615,36 +870,60 @@ function openCase(id){
   go('case');
 }
 
+/* ---------- records pages ---------- */
 function renderProperties(){
   const vc=visibleCases();
-  const head=`<thead><tr><th>Address</th><th>Deceased</th><th class="r">Value now</th><th class="r">At death</th><th>Tenure</th><th>Case</th></tr></thead>`;
-  const rows=vc.map(c=>`<tr onclick="openCase('${c.id}')"><td>${c.property.addr}</td><td>${c.deceased.name}</td><td class="r mono">${gbp(c.property.valueNow)}</td><td class="r mono">${gbp(c.property.valueDeath)}</td><td>${c.property.tenure}</td><td class="mono">${c.id}</td></tr>`).join('');
+  const head=`<thead><tr><th>Address</th><th>Postcode</th><th class="r">Beds</th><th>Tenure</th><th>Title no.</th><th class="r">Value now</th><th class="r">At death</th><th class="r">If modernised</th><th>Deceased</th><th>Case</th></tr></thead>`;
+  const rows=vc.map(c=>`<tr class="clk" onclick="openCase('${c.id}')">
+    <td><b style="font-weight:500">${c.property.addr}</b></td><td class="mono">${c.property.postcode}</td>
+    <td class="r">${c.property.beds}</td><td>${c.property.tenure}</td><td class="mono">${c.property.title}</td>
+    <td class="r mono">${gbp(c.property.valueNow)}</td><td class="r mono">${gbp(c.property.valueDeath)}</td><td class="r mono">${gbp(c.property.valueModern)}</td>
+    <td>${c.deceased.name}</td><td class="mono">${c.id}</td></tr>`).join('');
   document.getElementById('propTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
 }
 function renderReferrers(){
-  const head=`<thead><tr><th>Company</th><th>Type</th><th>Contact</th><th class="r">Commission</th><th>VAT reg.</th></tr></thead>`;
-  const rows=referrers.map(r=>`<tr style="cursor:default"><td><b style="font-weight:500">${r.name}</b><div class="sm">${r.email}</div></td><td>${r.type}</td><td>${r.contact}</td><td class="r">${r.commission}%</td><td>${r.vat?'<span class="pill blue">Yes</span>':'<span class="pill grey">No</span>'}</td></tr>`).join('');
+  const moneyCol = role.seeRevenue || role.seeCommission;
+  const head=`<thead><tr><th>Company</th><th>Type</th><th>Contact</th><th>Phone</th><th class="r">Commission</th><th>VAT reg.</th><th class="r">Active</th><th class="r">Total</th>${moneyCol?'<th class="r">Pipeline comm.</th>':''}</tr></thead>`;
+  const rows=referrers.map(r=>{const st=referrerStats(r.id);
+    return `<tr class="clk" onclick="setFilter('referrer','${r.id}','${r.name}')">
+      <td><b style="font-weight:500">${r.name}</b><div class="sm">${r.email}</div></td>
+      <td>${r.type}</td><td>${r.contact}</td><td class="sm">${r.phone}</td>
+      <td class="r">${r.commission}%</td><td>${r.vat?'<span class="pill blue">Yes</span>':'<span class="pill grey">No</span>'}</td>
+      <td class="r">${st.active}</td><td class="r">${st.total}</td>
+      ${moneyCol?`<td class="r mono" style="color:var(--money)">${gbp(st.pipelineComm)}</td>`:''}</tr>`;}).join('');
   document.getElementById('refTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
 }
 function renderClients(){
   const vc=visibleCases();
   const showMoney=role.seeRevenue;
-  const head=`<thead><tr><th>Heir</th><th>Relationship</th><th>Linked deceased</th><th class="r">Share</th>${showMoney?'<th class="r">Net to them</th>':''}<th>VAT</th><th>Case</th></tr></thead>`;
+  const head=`<thead><tr><th>Heir</th><th>Relationship</th><th>Linked deceased</th><th>Contact</th><th class="r">Share</th><th class="r">Inheritance</th>${showMoney?'<th class="r">Net to them</th>':''}<th>VAT</th><th>Status</th><th>Case</th></tr></thead>`;
   const rows=vc.flatMap(c=>c.heirs.map(h=>{const r=calcHeir(c.estate,h); const net=r.inheritance-r.grossFee;
-    return `<tr onclick="openCase('${c.id}')"><td><b style="font-weight:500">${h.name}</b></td><td>${h.rel}</td><td>${c.deceased.name}</td><td class="r">${h.share}%</td>${showMoney?`<td class="r mono">${gbp(net)}</td>`:''}<td>${h.uk?'<span class="pill blue">Chargeable</span>':'<span class="pill grey">Exempt</span>'}</td><td class="mono">${c.id}</td></tr>`;
+    return `<tr class="clk" onclick="openCase('${c.id}')">
+      <td><b style="font-weight:500">${h.name}</b><div class="sm">${h.uk?'UK resident':'Non-UK'}</div></td>
+      <td>${h.rel}</td><td>${c.deceased.name}</td>
+      <td class="sm">${h.email||'—'}<div>${h.phone||''}</div></td>
+      <td class="r">${h.share}%</td><td class="r mono">${gbp(r.inheritance)}</td>
+      ${showMoney?`<td class="r mono">${gbp(net)}</td>`:''}
+      <td>${h.uk?'<span class="pill blue">Chargeable</span>':'<span class="pill grey">Exempt</span>'}</td>
+      <td>${heirStatusPill(h.status)}</td><td class="mono">${c.id}</td></tr>`;
   })).join('');
   document.getElementById('clientTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
 }
 function renderDeceased(){
   const vc=visibleCases();
-  const head=`<thead><tr><th>Name</th><th>Place of birth</th><th>Reg. district</th><th>Linked property</th><th class="r">Other assets</th><th>Case</th></tr></thead>`;
-  const rows=vc.map(c=>`<tr onclick="openCase('${c.id}')"><td><b style="font-weight:500">${c.deceased.name}</b></td><td>${c.deceased.pob}</td><td>${c.deceased.reg}</td><td>${c.property.addr}</td><td class="r mono">${gbp(c.deceased.otherAssets)}</td><td class="mono">${c.id}</td></tr>`).join('');
+  const head=`<thead><tr><th>Name</th><th>Born</th><th>Died</th><th class="r">Age</th><th>Place of birth</th><th>Reg. district</th><th>Linked property</th><th class="r">Other assets</th><th class="r">Heirs</th><th>Case</th></tr></thead>`;
+  const rows=vc.map(c=>`<tr class="clk" onclick="openCase('${c.id}')">
+    <td><b style="font-weight:500">${c.deceased.name}</b></td><td class="sm">${c.deceased.dob}</td><td class="sm">${c.deceased.dod}</td>
+    <td class="r">${c.deceased.age}</td><td>${c.deceased.pob}</td><td>${c.deceased.reg}</td>
+    <td>${c.property.addr}<div class="sm">${c.property.postcode}</div></td><td class="r mono">${gbp(c.deceased.otherAssets)}</td>
+    <td class="r">${c.heirs.length}</td><td class="mono">${c.id}</td></tr>`).join('');
   document.getElementById('decTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
 }
 function renderIntake(){
-  const head=`<thead><tr><th>Address</th><th>Source</th><th>Referrer</th><th>Received</th><th>Flag</th><th></th></tr></thead>`;
-  const rows=intake.map(i=>{const ref=i.referrer?referrers.find(r=>r.id===i.referrer).name:'Public';
-    return `<tr style="cursor:default"><td>${i.addr}</td><td>${i.source}</td><td>${ref}</td><td>${i.date}</td><td><span class="pill amber">${i.flag}</span></td><td class="r"><button class="btn">Investigate</button></td></tr>`;}).join('');
+  const head=`<thead><tr><th>Address</th><th>Postcode</th><th>Source</th><th>Referrer</th><th>Received</th><th>Priority</th><th>Status</th><th></th></tr></thead>`;
+  const rows=intake.map((i,idx)=>{const ref=i.referrer?refName(i.referrer):'Public';
+    const pp=i.priority==='High'?'red':i.priority==='Medium'?'amber':'grey';
+    return `<tr style="cursor:default"><td><b style="font-weight:500">${i.addr}</b></td><td class="mono">${i.postcode}</td><td>${i.source}</td><td>${ref}</td><td>${i.date}</td><td><span class="pill ${pp}">${i.priority}</span></td><td><span class="pill ${i.flag==='New'?'blue':'grey'}">${i.flag}</span></td><td class="r"><button class="btn sm">Investigate</button></td></tr>`;}).join('');
   document.getElementById('intakeTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
 }
 function renderReports(){
@@ -653,7 +932,8 @@ function renderReports(){
   vc.forEach(c=>{const t=caseTotals(c); if(c.status==='active'){pipeline+=t.firmNet;}else{historic+=t.firmNet;} invoiced+=t.invoiced; vat+=t.vatHmrc; commission+=t.commission;});
   const m=document.getElementById('repMetrics');
   if(role.seeCommission){
-    m.innerHTML=`<div class="metric"><div class="k">Commission pipeline</div><div class="v money">${gbp(commission)}</div></div>`;
+    m.innerHTML=`<div class="metric"><div class="k">Commission pipeline</div><div class="v money">${gbp(commission)}</div></div>
+      <div class="metric"><div class="k">Cases referred</div><div class="v">${vc.length}</div></div>`;
   } else {
     m.innerHTML=`
       <div class="metric"><div class="k">Pipeline (potential)</div><div class="v money">${gbp(pipeline)}</div></div>
@@ -662,37 +942,35 @@ function renderReports(){
       <div class="metric"><div class="k">VAT to HMRC</div><div class="v">${gbp(vat)}</div></div>`;
   }
   renderChart('repChart');
-  const head=`<thead><tr><th>Case</th><th>Status</th><th class="r">Net revenue</th><th class="r">Invoiced</th><th class="r">VAT</th></tr></thead>`;
-  const rows=vc.map(c=>{const t=caseTotals(c);return `<tr onclick="openCase('${c.id}')"><td class="mono">${c.id}</td><td>${statusPill(c.status)}</td><td class="r mono" style="color:var(--money)">${gbp(t.firmNet)}</td><td class="r mono">${gbp(t.invoiced)}</td><td class="r mono">${gbp(t.vatHmrc)}</td></tr>`;}).join('');
+  const showComm=role.seeCommission;
+  const head=`<thead><tr><th>Case</th><th>Property</th><th>Stage</th><th>Status</th><th class="r">Heirs</th>${showComm?'<th class="r">Commission</th>':'<th class="r">Net revenue</th><th class="r">Invoiced</th><th class="r">VAT</th>'}</tr></thead>`;
+  const rows=vc.map(c=>{const t=caseTotals(c);return `<tr class="clk" onclick="openCase('${c.id}')">
+    <td class="mono">${c.id}</td><td>${c.property.addr}<div class="sm">${c.deceased.name}</div></td><td>${stagePill(c.stage)}</td><td>${statusPill(c.status)}</td><td class="r">${c.heirs.length}</td>
+    ${showComm?`<td class="r mono" style="color:var(--money)">${gbp(t.commission)}</td>`:`<td class="r mono" style="color:var(--money)">${gbp(t.firmNet)}</td><td class="r mono">${gbp(t.invoiced)}</td><td class="r mono">${gbp(t.vatHmrc)}</td>`}</tr>`;}).join('');
   document.getElementById('repTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
 }
 function renderDeleted(){
-  const head=`<thead><tr><th>Record</th><th>Deleted by</th><th>When</th><th>Reason</th><th></th></tr></thead>`;
-  const rows=deleted.map(d=>`<tr style="cursor:default"><td>${d.rec}</td><td>${d.by}</td><td>${d.when}</td><td class="muted">${d.reason}</td><td class="r"><button class="btn">Restore</button></td></tr>`).join('');
+  const head=`<thead><tr><th>Record</th><th>Type</th><th>Deleted by</th><th>When</th><th>Reason</th><th></th></tr></thead>`;
+  const rows=deleted.map(d=>`<tr style="cursor:default"><td><b style="font-weight:500">${d.rec}</b></td><td><span class="pill grey">${d.type}</span></td><td>${d.by}</td><td>${d.when}</td><td class="muted">${d.reason}</td><td class="r"><button class="btn sm">Restore</button></td></tr>`).join('');
   document.getElementById('delTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
 }
 
 /* ---------- role switch ---------- */
 function setRole(key){
   roleKey=key; role=ROLES[key];
+  caseFilter=null;
   document.getElementById('avatar').textContent=role.init;
   document.getElementById('whoName').textContent=role.name;
   document.getElementById('whoRole').textContent=role.label;
   renderNav();
-  // if current screen not allowed for role, bounce to dashboard
   const item = NAV.find(n=>n.id===current);
   if(current!=='case' && current!=='dashboard' && item && !navAllowed(item)) current='dashboard';
   if(current==='case') current='cases';
-  renderAll();
   go(current);
 }
-function renderAll(){
-  renderDashboard(); renderCases(); renderProperties(); renderReferrers();
-  renderClients(); renderDeceased(); renderIntake(); renderReports(); renderDeleted();
-}
 
-document.querySelectorAll('.new-case').forEach(b=>b.onclick=()=>alert('New case form — prototype'));
-renderNav(); renderAll(); go('dashboard');
+document.addEventListener('click',e=>{ if(e.target.closest('.new-case')) alert('New case form — prototype'); });
+renderNav(); go('dashboard');
 </script>
 </body>
 </html>
