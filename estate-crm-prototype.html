@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estate Trace CRM — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#11131a; --ink-2:#1b1e27; --ink-3:#262a35;
+    --page:#f5f6f8; --card:#ffffff;
+    --line:#e6e8ee; --line-2:#d6d9e2;
+    --tx:#1b212b; --tx-2:#5c6675; --tx-3:#8b94a3;
+    --accent:#3b5bdb; --accent-soft:#eaeefb;
+    --money:#1f8a4c; --money-soft:#e7f4ec;
+    --warn:#b06f02; --warn-soft:#fbf0db;
+    --danger:#c5392f; --danger-soft:#fbe9e7;
+    --radius:9px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--page);color:var(--tx);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .mono,.num{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+  .num{font-variant-numeric:tabular-nums}
+  a{color:var(--accent);text-decoration:none}
+
+  /* layout */
+  .app{display:grid;grid-template-columns:232px 1fr;grid-template-rows:56px 1fr;height:100vh;grid-template-areas:"brand top" "nav main"}
+  .brand{grid-area:brand;background:var(--ink);color:#fff;display:flex;align-items:center;gap:10px;padding:0 18px;border-bottom:1px solid #000}
+  .brand .logo{width:26px;height:26px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px}
+  .brand b{font-weight:600;letter-spacing:.2px}
+  .brand small{color:#9aa3b5;font-weight:400;font-size:11px;margin-left:2px}
+
+  .topbar{grid-area:top;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 20px;gap:16px}
+  .crumbs{color:var(--tx-2);font-size:13px}
+  .crumbs b{color:var(--tx);font-weight:500}
+  .topright{display:flex;align-items:center;gap:14px}
+  .rolewrap{display:flex;align-items:center;gap:8px}
+  .rolewrap label{font-size:12px;color:var(--tx-3)}
+  select{font-family:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line-2);border-radius:7px;background:#fff;color:var(--tx);cursor:pointer}
+  .who{display:flex;align-items:center;gap:9px}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px}
+  .who .meta{line-height:1.2}
+  .who .meta b{font-size:13px;font-weight:500}
+  .who .meta span{font-size:11px;color:var(--tx-3);display:block}
+
+  nav{grid-area:nav;background:var(--ink-2);padding:14px 12px;overflow-y:auto}
+  nav .group{color:#6c7488;font-size:10px;letter-spacing:.8px;text-transform:uppercase;margin:14px 10px 6px}
+  nav a.item{display:flex;align-items:center;gap:11px;color:#c4cad6;padding:8px 11px;border-radius:7px;font-size:13.5px;cursor:pointer;margin-bottom:1px;border:1px solid transparent}
+  nav a.item:hover{background:var(--ink-3);color:#fff}
+  nav a.item.active{background:var(--accent);color:#fff}
+  nav a.item .ic{width:17px;text-align:center;opacity:.9}
+  nav a.item .badge{margin-left:auto;background:#39414f;color:#fff;font-size:10px;padding:1px 7px;border-radius:20px;font-family:'IBM Plex Mono'}
+  nav a.item.active .badge{background:rgba(255,255,255,.25)}
+
+  main{grid-area:main;overflow-y:auto;padding:24px 28px 60px}
+  .screen{display:none}
+  .screen.show{display:block;animation:fade .18s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  h1{font-size:21px;font-weight:600;margin:0 0 2px}
+  h2{font-size:16px;font-weight:600;margin:0 0 12px}
+  .sub{color:var(--tx-2);font-size:13px;margin:0 0 20px}
+  .pagehead{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap}
+
+  .btn{font-family:inherit;font-size:13px;font-weight:500;padding:8px 14px;border-radius:7px;border:1px solid var(--line-2);background:#fff;color:var(--tx);cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{background:#f1f2f5}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{background:#2f4cc0}
+  .btn.danger{color:var(--danger);border-color:#f0cfcc}
+  .btn.danger:hover{background:var(--danger-soft)}
+
+  /* cards + grid */
+  .cards{display:grid;gap:14px}
+  .grid-4{grid-template-columns:repeat(4,1fr)}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  .grid-2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(2,1fr)}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+  .metric{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:15px 17px}
+  .metric .k{font-size:12px;color:var(--tx-2);display:flex;align-items:center;gap:6px}
+  .metric .v{font-size:26px;font-weight:600;margin-top:7px;letter-spacing:-.3px}
+  .metric .v.money{color:var(--money)}
+  .metric .d{font-size:11.5px;color:var(--tx-3);margin-top:3px}
+
+  /* tables */
+  table.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  table.tbl th{text-align:left;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--tx-3);font-weight:500;padding:11px 14px;background:#fafbfc;border-bottom:1px solid var(--line)}
+  table.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);font-size:13.5px}
+  table.tbl tr:last-child td{border-bottom:none}
+  table.tbl tbody tr{cursor:pointer}
+  table.tbl tbody tr:hover{background:#f7f8fb}
+  td.r,th.r{text-align:right}
+  .muted{color:var(--tx-2)}
+  .sm{font-size:11.5px;color:var(--tx-3)}
+
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:2px 9px;border-radius:20px}
+  .pill.green{background:var(--money-soft);color:var(--money)}
+  .pill.grey{background:#eef0f4;color:var(--tx-2)}
+  .pill.amber{background:var(--warn-soft);color:var(--warn)}
+  .pill.blue{background:var(--accent-soft);color:var(--accent)}
+  .pill.red{background:var(--danger-soft);color:var(--danger)}
+
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+  /* case detail */
+  .detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  .kv{width:100%;font-size:13px}
+  .kv td{padding:5px 0}
+  .kv td:first-child{color:var(--tx-2);width:46%}
+  .kv td:last-child{text-align:right;font-weight:500}
+  .cardtitle{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--tx);margin-bottom:11px;text-transform:none}
+  .cardtitle .ic{color:var(--tx-3)}
+
+  .alertbar{background:var(--warn-soft);border:1px solid #f0d9a8;border-radius:var(--radius);padding:12px 15px;display:flex;align-items:center;gap:10px;font-size:13px;color:#7a4d02}
+  .alertbar b{color:#5e3b01}
+
+  .backlink{color:var(--tx-2);font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:14px}
+  .backlink:hover{color:var(--accent)}
+
+  /* bars chart */
+  .bars{display:flex;align-items:flex-end;gap:10px;height:140px;padding-top:10px}
+  .bars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .bars .bar{width:60%;background:var(--accent);border-radius:5px 5px 0 0;min-height:3px}
+  .bars .bar.hist{background:#c4ccdd}
+  .bars .lbl{font-size:11px;color:var(--tx-3)}
+
+  .formrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .field label{display:block;font-size:12px;color:var(--tx-2);margin-bottom:5px}
+  .field input,.field textarea{width:100%;font-family:inherit;font-size:13.5px;padding:9px 11px;border:1px solid var(--line-2);border-radius:7px;background:#fff}
+  .hint{font-size:12px;color:var(--tx-3);margin-top:-6px;margin-bottom:14px}
+
+  .empty{color:var(--tx-3);font-size:13px;padding:40px;text-align:center;border:1px dashed var(--line-2);border-radius:var(--radius)}
+  .hide{display:none !important}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brand">
+    <div class="logo">E</div>
+    <div><b>Estate Trace</b> <small>CRM</small></div>
+  </div>
+
+  <div class="topbar">
+    <div class="crumbs" id="crumbs"><b>Dashboard</b></div>
+    <div class="topright">
+      <div class="rolewrap">
+        <label>Viewing as</label>
+        <select id="roleSel" onchange="setRole(this.value)">
+          <option value="super">Super admin — own firm</option>
+          <option value="mgmt">Management — own firm</option>
+          <option value="staff">Staff (Sarah) — own firm</option>
+          <option value="refmgmt">Referrer mgmt — Leeds CC</option>
+          <option value="refstaff">Referrer staff — Leeds CC</option>
+        </select>
+      </div>
+      <div class="who">
+        <div class="avatar" id="avatar">YO</div>
+        <div class="meta"><b id="whoName">You</b><span id="whoRole">Super admin</span></div>
+      </div>
+    </div>
+  </div>
+
+  <nav id="nav"></nav>
+
+  <main>
+    <!-- DASHBOARD -->
+    <section class="screen show" id="s-dashboard">
+      <div class="pagehead">
+        <div><h1 id="dashTitle">Dashboard</h1><p class="sub" id="dashSub">Pipeline and follow-ups across active cases</p></div>
+      </div>
+      <div class="cards grid-4" id="dashMetrics" style="margin-bottom:20px"></div>
+
+      <div class="cards grid-2" style="margin-bottom:20px">
+        <div class="card revenue">
+          <h2>Revenue by month</h2>
+          <div class="bars" id="dashChart"></div>
+          <div style="display:flex;gap:18px;margin-top:12px;font-size:11.5px;color:var(--tx-3)">
+            <span><span class="dot" style="background:var(--accent)"></span> Pipeline (potential)</span>
+            <span><span class="dot" style="background:#c4ccdd"></span> Closed (historic)</span>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Follow-ups due</h2>
+          <div id="dashFollow"></div>
+        </div>
+      </div>
+
+      <h2>Recent cases</h2>
+      <table class="tbl" id="dashCases"></table>
+    </section>
+
+    <!-- CASES -->
+    <section class="screen" id="s-cases">
+      <div class="pagehead">
+        <div><h1>Cases</h1><p class="sub" id="casesSub">Active estate cases you have access to</p></div>
+        <button class="btn primary new-case"><span>+</span> New case</button>
+      </div>
+      <table class="tbl" id="casesTbl"></table>
+    </section>
+
+    <!-- CASE DETAIL -->
+    <section class="screen" id="s-case">
+      <div class="backlink" onclick="go('cases')">← Back to cases</div>
+      <div id="caseBody"></div>
+    </section>
+
+    <!-- PROPERTIES -->
+    <section class="screen" id="s-properties">
+      <div class="pagehead">
+        <div><h1>Properties</h1><p class="sub">Logged property listings linked to a case and referrer</p></div>
+        <button class="btn primary">+ Add property</button>
+      </div>
+      <table class="tbl" id="propTbl"></table>
+    </section>
+
+    <!-- REFERRERS -->
+    <section class="screen" id="s-referrers">
+      <div class="pagehead">
+        <div><h1>Referrers</h1><p class="sub">Companies and local authorities that send us leads</p></div>
+        <button class="btn primary">+ Add referrer</button>
+      </div>
+      <table class="tbl" id="refTbl"></table>
+    </section>
+
+    <!-- CLIENTS / HEIRS -->
+    <section class="screen" id="s-clients">
+      <div class="pagehead">
+        <div><h1>Clients / heirs</h1><p class="sub">Living people we have engaged, linked to a deceased and a property</p></div>
+      </div>
+      <table class="tbl" id="clientTbl"></table>
+    </section>
+
+    <!-- DECEASED -->
+    <section class="screen" id="s-deceased">
+      <div class="pagehead">
+        <div><h1>Deceased</h1><p class="sub">Deceased persons linked to property and heirs</p></div>
+        <button class="btn primary">+ Add deceased</button>
+      </div>
+      <table class="tbl" id="decTbl"></table>
+    </section>
+
+    <!-- INTAKE QUEUE -->
+    <section class="screen" id="s-intake">
+      <div class="pagehead">
+        <div><h1>Intake queue</h1><p class="sub">New empty properties to investigate, flagged from forms and referrers</p></div>
+      </div>
+      <table class="tbl" id="intakeTbl"></table>
+      <h2 style="margin-top:26px">Public report form (preview)</h2>
+      <p class="sub">Embedded on the website. Submissions land in this queue with a "to investigate" flag.</p>
+      <div class="card" style="max-width:560px">
+        <div class="formrow">
+          <div class="field"><label>Property address</label><input placeholder="14 Elm Row, Leeds"></div>
+          <div class="field"><label>Postcode</label><input placeholder="LS8 2RT"></div>
+        </div>
+        <div class="formrow">
+          <div class="field"><label>Your name</label><input placeholder="Optional"></div>
+          <div class="field"><label>Your email</label><input placeholder="you@email.com"></div>
+        </div>
+        <div class="field" style="margin-bottom:14px"><label>What do you know about the property?</label><textarea rows="3" placeholder="Owner deceased, empty 6 months..."></textarea></div>
+        <button class="btn primary">Submit report</button>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="screen" id="s-reports">
+      <div class="pagehead">
+        <div><h1>Revenue reports</h1><p class="sub">Pipeline and historic revenue, monthly through yearly</p></div>
+      </div>
+      <div class="cards grid-4" id="repMetrics" style="margin-bottom:22px"></div>
+      <div class="card revenue" style="margin-bottom:22px">
+        <h2>Pipeline vs closed by month</h2>
+        <div class="bars" id="repChart"></div>
+      </div>
+      <h2>Per-case breakdown</h2>
+      <table class="tbl" id="repTbl"></table>
+    </section>
+
+    <!-- DELETED / AUDIT -->
+    <section class="screen" id="s-deleted">
+      <div class="pagehead">
+        <div><h1>Deleted records</h1><p class="sub">Soft-deleted data. Never physically removed. Restorable.</p></div>
+      </div>
+      <table class="tbl" id="delTbl"></table>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ---------- mock data ---------- */
+const VAT = 0.20;
+
+const referrers = [
+  {id:'r1', name:'Leeds City Council', type:'Local authority', commission:15, vat:true,  contact:'J. Okafor', email:'estates@leeds.gov.uk', phone:'0113 222 4000'},
+  {id:'r2', name:'Northgate Estates',  type:'Property finder', commission:12, vat:false, contact:'M. Hale',  email:'leads@northgate.co.uk', phone:'0161 884 1200'},
+  {id:'r3', name:'Harrow Council',     type:'Local authority', commission:15, vat:true,  contact:'S. Devi',  email:'probate@harrow.gov.uk', phone:'020 8901 2000'},
+];
+
+const staffUsers = {sarah:'Sarah Mills', tom:'Tom Reed'};
+
+const cases = [
+  { id:'EST-2041', status:'active', referrer:'r1', assigned:'sarah',
+    property:{addr:'14 Elm Row, Leeds LS8', valueNow:500000, valueDeath:430000, valueModern:560000, tenure:'Freehold', title:'WYK449201', beds:3},
+    deceased:{name:'Margaret Whitlock', pob:'Bradford', reg:'Leeds North', otherAssets:40000},
+    estate:500000,
+    heirs:[
+      {name:'David Whitlock', rel:'Son', uk:true,  share:25, fee:10, comm:15, refVat:true,  letter:{type:'Chase letter', date:'12 May', due:'26 May', overdue:true}},
+      {name:'Anna Beaulieu',  rel:'Daughter', uk:false, share:50, fee:8,  comm:10, refVat:false, letter:{type:'Contract', date:'02 Jun', due:'16 Jun', overdue:false}},
+    ]},
+  { id:'EST-2038', status:'active', referrer:'r2', assigned:'tom',
+    property:{addr:'7 Carlton Ave, Manchester M20', valueNow:285000, valueDeath:262000, valueModern:310000, tenure:'Leasehold', title:'GM118803', beds:2},
+    deceased:{name:'Albert Greaves', pob:'Salford', reg:'Manchester South', otherAssets:18000},
+    estate:285000,
+    heirs:[
+      {name:'Janet Greaves', rel:'Sister', uk:true, share:100, fee:12, comm:12, refVat:false, letter:{type:'Scam warning', date:'20 Jun', due:'04 Jul', overdue:false}},
+    ]},
+  { id:'EST-2052', status:'active', referrer:'r3', assigned:'sarah',
+    property:{addr:'33 Pinner Rd, Harrow HA1', valueNow:640000, valueDeath:600000, valueModern:700000, tenure:'Freehold', title:'MX552014', beds:4},
+    deceased:{name:'Doris Fenwick', pob:'Harrow', reg:'Harrow', otherAssets:75000},
+    estate:640000,
+    heirs:[
+      {name:'Peter Fenwick', rel:'Nephew', uk:true,  share:40, fee:10, comm:15, refVat:true, letter:{type:'Chase letter', date:'08 May', due:'22 May', overdue:true}},
+      {name:'Lucia Romano',  rel:'Cousin', uk:false, share:30, fee:10, comm:15, refVat:true, letter:{type:'Contract', date:'18 Jun', due:'02 Jul', overdue:false}},
+    ]},
+  { id:'EST-2019', status:'closed', referrer:'r1', assigned:'tom',
+    property:{addr:'2 Beech Close, Leeds LS6', valueNow:210000, valueDeath:198000, valueModern:240000, tenure:'Freehold', title:'WYK330117', beds:2},
+    deceased:{name:'Harold Pyne', pob:'Leeds', reg:'Leeds West', otherAssets:9000},
+    estate:210000,
+    heirs:[
+      {name:'Ruth Pyne', rel:'Daughter', uk:true, share:100, fee:12, comm:15, refVat:true, letter:{type:'Contract', date:'10 Feb', due:'24 Feb', overdue:false}},
+    ]},
+  { id:'EST-2007', status:'closed', referrer:'r2', assigned:'sarah',
+    property:{addr:'19 Mill Lane, Stockport SK4', valueNow:175000, valueDeath:170000, valueModern:200000, tenure:'Leasehold', title:'GM092200', beds:2},
+    deceased:{name:'Edna Bramwell', pob:'Stockport', reg:'Stockport', otherAssets:6000},
+    estate:175000,
+    heirs:[
+      {name:'Colin Bramwell', rel:'Son', uk:true, share:60, fee:10, comm:12, refVat:false, letter:{type:'Contract', date:'14 Jan', due:'28 Jan', overdue:false}},
+      {name:'Maria Bramwell', rel:'Daughter', uk:true, share:40, fee:10, comm:12, refVat:false, letter:{type:'Other', date:'14 Jan', due:'28 Jan', overdue:false}},
+    ]},
+];
+
+const intake = [
+  {addr:'81 Foundry St, Leeds LS9', source:'Website form', referrer:'r1', date:'28 Jun', flag:'New'},
+  {addr:'5 Vicarage Rd, Harrow HA2', source:'Referrer upload', referrer:'r3', date:'27 Jun', flag:'New'},
+  {addr:'12 Quay St, Manchester M3', source:'Website form', referrer:null, date:'25 Jun', flag:'New'},
+];
+
+const deleted = [
+  {rec:'Case EST-1990', by:'Priya (Management)', when:'19 Jun', reason:'Duplicate of EST-1988'},
+  {rec:'Client: George Tully', by:'You (Super admin)', when:'11 Jun', reason:'Wrong estate linked'},
+];
+
+/* ---------- revenue engine ---------- */
+function calcHeir(estate, h){
+  const inheritance = estate * h.share/100;
+  const netFee = inheritance * h.fee/100;
+  const vatFee = h.uk ? netFee*VAT : 0;
+  const grossFee = netFee + vatFee;
+  const netComm = netFee * h.comm/100;
+  const vatComm = h.refVat ? netComm*VAT : 0;
+  const grossComm = netComm + vatComm;
+  const firmNet = netFee - netComm;
+  return {inheritance, netFee, vatFee, grossFee, netComm, vatComm, grossComm, firmNet};
+}
+function caseTotals(c){
+  let firmNet=0, invoiced=0, vatOut=0, vatIn=0, comm=0;
+  c.heirs.forEach(h=>{const r=calcHeir(c.estate,h); firmNet+=r.firmNet; invoiced+=r.grossFee; vatOut+=r.vatFee; vatIn+=r.vatComm; comm+=r.netComm;});
+  return {firmNet, invoiced, vatHmrc:vatOut-vatIn, commission:comm};
+}
+const gbp = n => '£'+Math.round(n).toLocaleString('en-GB');
+
+/* ---------- roles ---------- */
+const ROLES = {
+  super:   {name:'You', init:'YO', label:'Super admin', scope:'own', seeRevenue:true, seeCommission:false, canDelete:true},
+  mgmt:    {name:'Priya Nair', init:'PN', label:'Management', scope:'own', seeRevenue:false, seeCommission:false, canDelete:true},
+  staff:   {name:'Sarah Mills', init:'SM', label:'Staff', scope:'own-assigned', uid:'sarah', seeRevenue:false, seeCommission:false, canDelete:false},
+  refmgmt: {name:'J. Okafor', init:'JO', label:'Referrer management · Leeds CC', scope:'referrer', company:'r1', seeRevenue:false, seeCommission:true, canDelete:false},
+  refstaff:{name:'A. Bell', init:'AB', label:'Referrer staff · Leeds CC', scope:'referrer', company:'r1', seeRevenue:false, seeCommission:false, canDelete:false},
+};
+let role = ROLES.super;
+let roleKey = 'super';
+
+const NAV = [
+  {grp:'Operations'},
+  {id:'dashboard', ic:'▦', label:'Dashboard', roles:'all'},
+  {id:'cases', ic:'▤', label:'Cases', roles:'all', badge:()=>visibleCases().filter(c=>c.status==='active').length},
+  {id:'intake', ic:'⬚', label:'Intake queue', roles:['super','mgmt','staff'], badge:()=>intake.length},
+  {grp:'Records', roles:['super','mgmt','staff']},
+  {id:'properties', ic:'⌂', label:'Properties', roles:['super','mgmt','staff']},
+  {id:'deceased', ic:'†', label:'Deceased', roles:['super','mgmt','staff']},
+  {id:'clients', ic:'☺', label:'Clients / heirs', roles:['super','mgmt','staff']},
+  {id:'referrers', ic:'⬢', label:'Referrers', roles:['super','mgmt']},
+  {grp:'Finance'},
+  {id:'reports', ic:'⊞', label:'Revenue reports', roles:['super','refmgmt']},
+  {grp:'Admin', roles:['super','mgmt']},
+  {id:'deleted', ic:'⟲', label:'Deleted records', roles:['super','mgmt']},
+];
+
+/* ---------- access helpers ---------- */
+function visibleCases(){
+  return cases.filter(c=>{
+    if(role.scope==='own') return true;
+    if(role.scope==='own-assigned') return c.assigned===role.uid;
+    if(role.scope==='referrer') return c.referrer===role.company;
+    return false;
+  });
+}
+function navAllowed(item){
+  if(item.roles==='all'||!item.roles) return true;
+  return item.roles.includes(roleKey);
+}
+
+/* ---------- render ---------- */
+function renderNav(){
+  const nav = document.getElementById('nav');
+  nav.innerHTML='';
+  NAV.forEach(item=>{
+    if(item.grp){
+      if(item.roles && !item.roles.includes(roleKey)) return;
+      const g=document.createElement('div'); g.className='group'; g.textContent=item.grp; nav.appendChild(g); return;
+    }
+    if(!navAllowed(item)) return;
+    const a=document.createElement('a'); a.className='item'; a.dataset.screen=item.id;
+    a.onclick=()=>go(item.id);
+    let badge = item.badge? `<span class="badge">${item.badge()}</span>`:'';
+    a.innerHTML=`<span class="ic">${item.ic}</span><span>${item.label}</span>${badge}`;
+    nav.appendChild(a);
+  });
+  highlightNav(current);
+}
+function highlightNav(id){
+  document.querySelectorAll('nav .item').forEach(a=>a.classList.toggle('active', a.dataset.screen===id));
+}
+
+let current='dashboard';
+function go(id){
+  current=id;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
+  const el=document.getElementById('s-'+id); if(el) el.classList.add('show');
+  highlightNav(id==='case'?'cases':id);
+  const labels={dashboard:'Dashboard',cases:'Cases',case:'Case detail',properties:'Properties',referrers:'Referrers',clients:'Clients / heirs',deceased:'Deceased',intake:'Intake queue',reports:'Revenue reports',deleted:'Deleted records'};
+  document.getElementById('crumbs').innerHTML=`<b>${labels[id]||id}</b>`;
+  window.scrollTo(0,0);
+}
+
+function statusPill(s){ return s==='active'?'<span class="pill green"><span class="dot" style="background:var(--money)"></span>Active</span>':'<span class="pill grey">Closed</span>'; }
+
+function renderDashboard(){
+  const vc = visibleCases();
+  const active = vc.filter(c=>c.status==='active');
+  const closed = vc.filter(c=>c.status==='closed');
+  let pipeline=0, historic=0, commission=0;
+  active.forEach(c=>{pipeline+=caseTotals(c).firmNet; commission+=caseTotals(c).commission;});
+  closed.forEach(c=>{historic+=caseTotals(c).firmNet;});
+  const overdue = vc.flatMap(c=>c.heirs.filter(h=>h.letter.overdue).map(h=>({c,h}))).length;
+
+  // metrics depend on role
+  const m=document.getElementById('dashMetrics'); m.innerHTML='';
+  const metrics=[];
+  metrics.push({k:'Active cases',v:active.length});
+  if(role.seeRevenue){
+    metrics.push({k:'Pipeline revenue',v:gbp(pipeline),money:true,d:'Our net, potential'});
+    metrics.push({k:'Historic revenue',v:gbp(historic),money:true,d:'Closed cases'});
+  } else if(role.seeCommission){
+    metrics.push({k:'Potential commission',v:gbp(commission),money:true,d:'Due to you on active cases'});
+    metrics.push({k:'Cases referred',v:vc.length});
+  } else {
+    metrics.push({k:'Closed cases',v:closed.length});
+    metrics.push({k:'Heirs engaged',v:vc.reduce((a,c)=>a+c.heirs.length,0)});
+  }
+  metrics.push({k:'Follow-ups due',v:overdue,d:overdue?'Action needed':'All clear'});
+  metrics.forEach(x=>{
+    m.innerHTML+=`<div class="metric"><div class="k">${x.k}</div><div class="v ${x.money?'money':''}">${x.v}</div>${x.d?`<div class="d">${x.d}</div>`:''}</div>`;
+  });
+
+  // chart
+  document.querySelectorAll('.card.revenue').forEach(c=>c.classList.toggle('hide', !(role.seeRevenue||role.seeCommission)));
+  if(role.seeRevenue||role.seeCommission) renderChart('dashChart');
+
+  // follow ups
+  const f=document.getElementById('dashFollow');
+  const fl = vc.flatMap(c=>c.heirs.filter(h=>h.letter.overdue).map(h=>({c,h})));
+  f.innerHTML = fl.length? fl.map(({c,h})=>`<div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)"><div><b style="font-weight:500">${h.name}</b><div class="sm">${c.id} · ${h.letter.type} sent ${h.letter.date}</div></div><span class="pill amber">Due ${h.letter.due}</span></div>`).join('') : '<div class="empty">No outstanding follow-ups</div>';
+
+  // recent cases
+  renderCaseTable('dashCases', vc.slice(0,4));
+  document.getElementById('dashTitle').textContent = role.scope==='referrer'? 'Referrer dashboard' : 'Dashboard';
+  document.getElementById('dashSub').textContent = role.seeCommission? 'Your referred cases and potential commission' : 'Pipeline and follow-ups across your cases';
+}
+
+function renderChart(elId){
+  const data=[{m:'Feb',p:0,h:8200},{m:'Mar',p:0,h:5400},{m:'Apr',p:6800,h:0},{m:'May',p:18400,h:0},{m:'Jun',p:24600,h:0}];
+  const max=Math.max(...data.map(d=>Math.max(d.p,d.h)));
+  document.getElementById(elId).innerHTML=data.map(d=>{
+    const ph=d.p/max*100, hh=d.h/max*100;
+    const bar = d.p>0?`<div class="bar" style="height:${ph}%"></div>`:`<div class="bar hist" style="height:${hh}%"></div>`;
+    return `<div class="col">${bar}<div class="lbl">${d.m}</div></div>`;
+  }).join('');
+}
+
+function renderCaseTable(elId, list){
+  const showMoney = role.seeRevenue;
+  const showComm = role.seeCommission;
+  const head=`<thead><tr><th>Case</th><th>Property</th><th>Referrer</th><th>Heirs</th>${showMoney?'<th class="r">Net revenue</th>':''}${showComm?'<th class="r">Your commission</th>':''}<th>Status</th></tr></thead>`;
+  const rows=list.map(c=>{
+    const t=caseTotals(c); const ref=referrers.find(r=>r.id===c.referrer);
+    return `<tr onclick="openCase('${c.id}')">
+      <td><b style="font-weight:500" class="mono">${c.id}</b></td>
+      <td>${c.property.addr}<div class="sm">${c.deceased.name}</div></td>
+      <td>${ref.name}</td>
+      <td>${c.heirs.length}</td>
+      ${showMoney?`<td class="r mono" style="color:var(--money)">${gbp(t.firmNet)}</td>`:''}
+      ${showComm?`<td class="r mono" style="color:var(--money)">${gbp(t.commission)}</td>`:''}
+      <td>${statusPill(c.status)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById(elId).innerHTML=head+'<tbody>'+(rows||`<tr><td colspan="7"><div class="empty">No cases visible to this role</div></td></tr>`)+'</tbody>';
+}
+
+function renderCases(){
+  renderCaseTable('casesTbl', visibleCases());
+  document.getElementById('casesSub').textContent = role.scope==='referrer'? 'Cases you referred to us' : 'Estate cases you have access to';
+}
+
+function openCase(id){
+  const c=cases.find(x=>x.id===id);
+  const ref=referrers.find(r=>r.id===c.referrer);
+  const t=caseTotals(c);
+  const showMoney=role.seeRevenue, showComm=role.seeCommission;
+
+  const heirHead=`<tr><th>Heir</th><th class="r">Share</th>${showMoney?'<th class="r">Our fee</th><th class="r">VAT</th><th class="r">Commission</th><th class="r">Net kept</th>':''}${showComm?'<th class="r">Commission to you</th>':''}<th>Last letter</th></tr>`;
+  const heirRows=c.heirs.map(h=>{
+    const r=calcHeir(c.estate,h);
+    return `<tr style="cursor:default">
+      <td><b style="font-weight:500">${h.name}</b><div class="sm">${h.rel} · ${h.uk?'UK':'Non-UK'}</div></td>
+      <td class="r mono">${gbp(r.inheritance)}<div class="sm">${h.share}%</div></td>
+      ${showMoney?`<td class="r mono">${gbp(r.netFee)}</td><td class="r mono">${gbp(r.vatFee)}</td><td class="r mono">${gbp(r.netComm)}</td><td class="r mono" style="color:var(--money);font-weight:500">${gbp(r.firmNet)}</td>`:''}
+      ${showComm?`<td class="r mono" style="color:var(--money)">${gbp(r.grossComm)}</td>`:''}
+      <td>${h.letter.type} · ${h.letter.date}${h.letter.overdue?' <span class="pill amber">overdue</span>':''}</td>
+    </tr>`;
+  }).join('');
+
+  const overdueHeir=c.heirs.find(h=>h.letter.overdue);
+
+  let moneyStrip='';
+  if(showMoney){
+    moneyStrip=`<div class="cards grid-3" style="margin:16px 0">
+      <div class="metric"><div class="k">Firm net revenue</div><div class="v money">${gbp(t.firmNet)}</div></div>
+      <div class="metric"><div class="k">Total invoiced</div><div class="v">${gbp(t.invoiced)}</div></div>
+      <div class="metric"><div class="k">VAT to HMRC</div><div class="v">${gbp(t.vatHmrc)}</div></div>
+    </div>`;
+  } else if(showComm){
+    moneyStrip=`<div class="cards grid-3" style="margin:16px 0">
+      <div class="metric"><div class="k">Your commission (potential)</div><div class="v money">${gbp(t.commission)}</div></div>
+    </div>`;
+  }
+
+  document.getElementById('caseBody').innerHTML=`
+    <div class="detail-head">
+      <div>
+        <h1 style="display:flex;align-items:center;gap:10px"><span class="mono">${c.id}</span> ${statusPill(c.status)}</h1>
+        <p class="sub" style="margin-top:4px">Estate of ${c.deceased.name} · ${c.property.addr}</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        ${role.canDelete?'<button class="btn danger">Soft delete</button>':''}
+        ${(role.scope==='own')?'<button class="btn">Close case</button>':''}
+      </div>
+    </div>
+
+    <div class="cards grid-3" style="margin-bottom:8px">
+      <div class="card">
+        <div class="cardtitle"><span class="ic">⌂</span> Property</div>
+        <table class="kv">
+          <tr><td>Value now</td><td>${gbp(c.property.valueNow)}</td></tr>
+          <tr><td>At death</td><td>${gbp(c.property.valueDeath)}</td></tr>
+          <tr><td>If modernised</td><td>${gbp(c.property.valueModern)}</td></tr>
+          <tr><td>Tenure</td><td>${c.property.tenure}</td></tr>
+          <tr><td>Title no.</td><td class="mono">${c.property.title}</td></tr>
+          <tr><td>Bedrooms</td><td>${c.property.beds}</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="cardtitle"><span class="ic">†</span> Deceased</div>
+        <table class="kv">
+          <tr><td>Name</td><td>${c.deceased.name}</td></tr>
+          <tr><td>Place of birth</td><td>${c.deceased.pob}</td></tr>
+          <tr><td>Reg. district</td><td>${c.deceased.reg}</td></tr>
+          <tr><td>Other assets</td><td>${gbp(c.deceased.otherAssets)}</td></tr>
+          <tr><td>Estate value (calc)</td><td>${gbp(c.estate)}</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="cardtitle"><span class="ic">⬢</span> Referred by</div>
+        <table class="kv">
+          <tr><td>Company</td><td>${ref.name}</td></tr>
+          <tr><td>Type</td><td>${ref.type}</td></tr>
+          <tr><td>Commission</td><td>${ref.commission}%</td></tr>
+          <tr><td>VAT registered</td><td>${ref.vat?'Yes':'No'}</td></tr>
+          <tr><td>Contact</td><td>${ref.contact}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    ${moneyStrip}
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="cardtitle"><span class="ic">☺</span> Heirs ${showMoney?'· revenue calculation':''}</div>
+      <table class="tbl" style="border:none">${heirHead}<tbody>${heirRows}</tbody></table>
+    </div>
+
+    ${overdueHeir?`<div class="alertbar"><span style="font-size:16px">⚑</span><div><b>Follow up due.</b> ${overdueHeir.letter.type} to ${overdueHeir.name} sent ${overdueHeir.letter.date}, no response. Due ${overdueHeir.letter.due}.</div></div>`:''}
+  `;
+  go('case');
+}
+
+function renderProperties(){
+  const vc=visibleCases();
+  const head=`<thead><tr><th>Address</th><th>Deceased</th><th class="r">Value now</th><th class="r">At death</th><th>Tenure</th><th>Case</th></tr></thead>`;
+  const rows=vc.map(c=>`<tr onclick="openCase('${c.id}')"><td>${c.property.addr}</td><td>${c.deceased.name}</td><td class="r mono">${gbp(c.property.valueNow)}</td><td class="r mono">${gbp(c.property.valueDeath)}</td><td>${c.property.tenure}</td><td class="mono">${c.id}</td></tr>`).join('');
+  document.getElementById('propTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
+}
+function renderReferrers(){
+  const head=`<thead><tr><th>Company</th><th>Type</th><th>Contact</th><th class="r">Commission</th><th>VAT reg.</th></tr></thead>`;
+  const rows=referrers.map(r=>`<tr style="cursor:default"><td><b style="font-weight:500">${r.name}</b><div class="sm">${r.email}</div></td><td>${r.type}</td><td>${r.contact}</td><td class="r">${r.commission}%</td><td>${r.vat?'<span class="pill blue">Yes</span>':'<span class="pill grey">No</span>'}</td></tr>`).join('');
+  document.getElementById('refTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
+}
+function renderClients(){
+  const vc=visibleCases();
+  const showMoney=role.seeRevenue;
+  const head=`<thead><tr><th>Heir</th><th>Relationship</th><th>Linked deceased</th><th class="r">Share</th>${showMoney?'<th class="r">Net to them</th>':''}<th>VAT</th><th>Case</th></tr></thead>`;
+  const rows=vc.flatMap(c=>c.heirs.map(h=>{const r=calcHeir(c.estate,h); const net=r.inheritance-r.grossFee;
+    return `<tr onclick="openCase('${c.id}')"><td><b style="font-weight:500">${h.name}</b></td><td>${h.rel}</td><td>${c.deceased.name}</td><td class="r">${h.share}%</td>${showMoney?`<td class="r mono">${gbp(net)}</td>`:''}<td>${h.uk?'<span class="pill blue">Chargeable</span>':'<span class="pill grey">Exempt</span>'}</td><td class="mono">${c.id}</td></tr>`;
+  })).join('');
+  document.getElementById('clientTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
+}
+function renderDeceased(){
+  const vc=visibleCases();
+  const head=`<thead><tr><th>Name</th><th>Place of birth</th><th>Reg. district</th><th>Linked property</th><th class="r">Other assets</th><th>Case</th></tr></thead>`;
+  const rows=vc.map(c=>`<tr onclick="openCase('${c.id}')"><td><b style="font-weight:500">${c.deceased.name}</b></td><td>${c.deceased.pob}</td><td>${c.deceased.reg}</td><td>${c.property.addr}</td><td class="r mono">${gbp(c.deceased.otherAssets)}</td><td class="mono">${c.id}</td></tr>`).join('');
+  document.getElementById('decTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
+}
+function renderIntake(){
+  const head=`<thead><tr><th>Address</th><th>Source</th><th>Referrer</th><th>Received</th><th>Flag</th><th></th></tr></thead>`;
+  const rows=intake.map(i=>{const ref=i.referrer?referrers.find(r=>r.id===i.referrer).name:'Public';
+    return `<tr style="cursor:default"><td>${i.addr}</td><td>${i.source}</td><td>${ref}</td><td>${i.date}</td><td><span class="pill amber">${i.flag}</span></td><td class="r"><button class="btn">Investigate</button></td></tr>`;}).join('');
+  document.getElementById('intakeTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
+}
+function renderReports(){
+  const vc=visibleCases();
+  let pipeline=0,historic=0,invoiced=0,vat=0,commission=0;
+  vc.forEach(c=>{const t=caseTotals(c); if(c.status==='active'){pipeline+=t.firmNet;}else{historic+=t.firmNet;} invoiced+=t.invoiced; vat+=t.vatHmrc; commission+=t.commission;});
+  const m=document.getElementById('repMetrics');
+  if(role.seeCommission){
+    m.innerHTML=`<div class="metric"><div class="k">Commission pipeline</div><div class="v money">${gbp(commission)}</div></div>`;
+  } else {
+    m.innerHTML=`
+      <div class="metric"><div class="k">Pipeline (potential)</div><div class="v money">${gbp(pipeline)}</div></div>
+      <div class="metric"><div class="k">Historic (closed)</div><div class="v money">${gbp(historic)}</div></div>
+      <div class="metric"><div class="k">Total invoiced</div><div class="v">${gbp(invoiced)}</div></div>
+      <div class="metric"><div class="k">VAT to HMRC</div><div class="v">${gbp(vat)}</div></div>`;
+  }
+  renderChart('repChart');
+  const head=`<thead><tr><th>Case</th><th>Status</th><th class="r">Net revenue</th><th class="r">Invoiced</th><th class="r">VAT</th></tr></thead>`;
+  const rows=vc.map(c=>{const t=caseTotals(c);return `<tr onclick="openCase('${c.id}')"><td class="mono">${c.id}</td><td>${statusPill(c.status)}</td><td class="r mono" style="color:var(--money)">${gbp(t.firmNet)}</td><td class="r mono">${gbp(t.invoiced)}</td><td class="r mono">${gbp(t.vatHmrc)}</td></tr>`;}).join('');
+  document.getElementById('repTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
+}
+function renderDeleted(){
+  const head=`<thead><tr><th>Record</th><th>Deleted by</th><th>When</th><th>Reason</th><th></th></tr></thead>`;
+  const rows=deleted.map(d=>`<tr style="cursor:default"><td>${d.rec}</td><td>${d.by}</td><td>${d.when}</td><td class="muted">${d.reason}</td><td class="r"><button class="btn">Restore</button></td></tr>`).join('');
+  document.getElementById('delTbl').innerHTML=head+'<tbody>'+rows+'</tbody>';
+}
+
+/* ---------- role switch ---------- */
+function setRole(key){
+  roleKey=key; role=ROLES[key];
+  document.getElementById('avatar').textContent=role.init;
+  document.getElementById('whoName').textContent=role.name;
+  document.getElementById('whoRole').textContent=role.label;
+  renderNav();
+  // if current screen not allowed for role, bounce to dashboard
+  const item = NAV.find(n=>n.id===current);
+  if(current!=='case' && current!=='dashboard' && item && !navAllowed(item)) current='dashboard';
+  if(current==='case') current='cases';
+  renderAll();
+  go(current);
+}
+function renderAll(){
+  renderDashboard(); renderCases(); renderProperties(); renderReferrers();
+  renderClients(); renderDeceased(); renderIntake(); renderReports(); renderDeleted();
+}
+
+document.querySelectorAll('.new-case').forEach(b=>b.onclick=()=>alert('New case form — prototype'));
+renderNav(); renderAll(); go('dashboard');
+</script>
+</body>
+</html>
